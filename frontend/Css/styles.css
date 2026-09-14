@@ -1,0 +1,75 @@
+/* Variables de Color Institucional y Configuracion Global 
+Permite cambiar el esquema visual del portal desde un solo lugar sin modificar regla por regla*/
+:root {
+    --color-primary: #0d6efd;      /* Azul Institucional */
+    --color-secondary: #0b5ed7;    /* Azul Institucional Oscuro */
+    --color-accent: #198754;       /* Verde Serranoble */
+    --color-bg-light: #f8f9fa;     /* Fondo gris claro para secciones */
+    --color-text-dark: #212529;    /* Texto principal dark*/
+    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    font-family: var(--font-family-base);
+    color: var(--color-text-dark);
+    background-color: #ffffff;
+    min-height: 100vh;
+    display: flex; /*  */
+    flex-direction: column; /* permite que permanezca pegado al final de la pantalla aunque no haya contenido */
+}
+
+/* Cabecera y Navegacion (<header>, <nav>) */
+header .navbar {
+    background-color: var(--color-primary) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil de separacion */
+}
+
+.navbar-brand span {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
+}
+
+.nav-link:hover {
+    color: #e2e6ea !important;
+}
+
+/* Seccion Principal*/
+main {
+    flex: 1; /* pie de pagina quede siempre abajo */
+}
+
+.hero {
+    background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+    border-left: 5px solid var(--color-accent);
+    padding: 3rem 1.5rem;
+}
+
+.hero h1 {
+    color: var(--color-primary);
+}
+
+/* 4. Pie de Pagina (<footer>) */
+footer {
+    background-color: #211a1f !important;
+    font-size: 0.9rem;
+    border-top: 3px solid var(--color-accent); /* color verde superior, esta arriba */
+}
+
+/* Ajustes para Accesibilidad y Dispositivos Moviles */
+/* reduce margenes y tamalo de letra automaticamente para eso */
+/* Usabilidad y Accesibilidad, rnf2 y rnf3 */
+@media (max-width: 768px) {
+    .hero {
+        padding: 2rem 1rem;
+    }
+    
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+}
