@@ -47,9 +47,26 @@ document.addEventListener('DOMContentLoaded', () => {
 			clearFieldError(passwordInput);
 		}
 
-		// Redirige a la página principal cuando todos los datos son válidos.
-		if (formularioValido) {
-			window.location.href = loginForm.action;
+		// Si hay algún error en el formulario, muestra una alerta con SweetAlert2.
+		if (!formularioValido) {
+			Swal.fire({
+				icon: 'error',
+				title: 'Datos incorrectos',
+				text: 'Por favor, verificá que el correo tenga un formato válido y que la contraseña no esté vacía.',
+				confirmButtonColor: '#0d6efd'
+			});
+			return;
 		}
+
+		// Si el formulario es válido, muestra un mensaje de éxito antes de redirigir.
+		Swal.fire({
+			icon: 'success',
+			title: '¡Bienvenido!',
+			text: 'Iniciando sesión...',
+			showConfirmButton: false,
+			timer: 1500
+		}).then(() => {
+			window.location.href = loginForm.action;
+		});
 	});
 });
