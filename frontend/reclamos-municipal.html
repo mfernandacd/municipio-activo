@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Reclamos - Municipio Serranoble</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome (Íconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="reclamos.css">
+
+</head>
+<body>
+
+    <!-- Header con Logo Central -->
+    <header class="header-brand mb-4">
+        <div class="container text-center">
+            <!-- Imagen del Logo -->
+            <img src="logo muni.jpeg" alt="Municipio Serranoble" class="logo-img mb-2">
+            <h1 class="h3 text-white m-0">Atención al Ciudadano</h1>
+            <p class="text-light small mb-0">Municipio de Serranoble</p>
+        </div>
+    </header>
+
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+
+                <!-- Botón Directo de WhatsApp (Reclamos Directos) -->
+                <div class="text-center mb-4">
+                    <a href="https://wa.me/5493804626212?text=Hola,%20deseo%20realizar%20un%20reclamo%20directo." 
+                       target="_blank" 
+                       class="btn-whatsapp">
+                        <i class="fa-brands fa-whatsapp fa-lg"></i>
+                        Reclamos Directos por WhatsApp (3804626212)
+                    </a>
+                </div>
+
+                <!-- Formulario de Carga -->
+                <div class="card card-custom p-4">
+                    <h2 class="h4 mb-3 text-center" style="color: var(--color-primary);">
+                        <i class="fa-solid fa-pen-to-square me-2"></i>Cargar Nuevo Reclamo
+                    </h2>
+                    <hr class="mb-4">
+
+                    <form id="formReclamo" enctype="multipart/form-data" novalidate>
+                        
+                        <!-- Categoría -->
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label fw-bold">Categoría del Reclamo <span class="text-danger">*</span></label>
+                            <select class="form-select" id="categoria" name="categoria" required>
+                                <option value="" selected disabled>Seleccione una categoría...</option>
+                                <option value="Luminarias">Luminarias</option>
+                                <option value="Bacheo">Bacheo</option>
+                                <option value="Limpieza">Limpieza</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+
+                        <!-- Dirección -->
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label fw-bold">Dirección / Ubicación <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Ej: Av. San Martín 1234, Barrio Centro" required>
+                        </div>
+
+                        <!-- Link Google Maps -->
+                        <div class="mb-3">
+                            <label for="googleMapsUrl" class="form-label fw-bold">Enlace de Google Maps (Opcional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                                <input type="url" class="form-control" id="googleMapsUrl" name="googleMapsUrl" placeholder="https://maps.google.com/...">
+                            </div>
+                        </div>
+
+                        <!-- Descripción -->
+                        <div class="mb-3">
+                            <label for="descripcion" class="form-label fw-bold">Descripción Detallada <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="4" placeholder="Describa la situación del problema (Mínimo 15 caracteres)..." required></textarea>
+                            <div class="form-text text-end" id="charCounter">0 caracteres</div>
+                        </div>
+
+                        <!-- Carga de Imagen -->
+                        <div class="mb-4">
+                            <label for="imagen" class="form-label fw-bold">Foto del Reclamo (Opcional)</label>
+                            <input class="form-control" type="file" id="imagen" name="imagen" accept="image/*">
+                        </div>
+
+                        <!-- Botón Enviar -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-serranoble btn-lg">
+                                <i class="fa-solid fa-paper-plane me-2"></i>Enviar Reclamo
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Script de Validación y Eventos -->
+    <script>
+        const formReclamo = document.getElementById('formReclamo');
+        const descripcionInput = document.getElementById('descripcion');
+        const charCounter = document.getElementById('charCounter');
+
+        // Contador de caracteres en tiempo real
+        descripcionInput.addEventListener('input', () => {
+            charCounter.textContent = `${descripcionInput.value.length} caracteres`;
+        });
+
+        // Evento Submit con SweetAlert2
+        formReclamo.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const categoria = document.getElementById('categoria').value;
+            const direccion = document.getElementById('direccion').value.trim();
+            const descripcion = descripcionInput.value.trim();
+
+            // 1. Validaciones requeridas
+            if (!categoria) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Categoría Requerida',
+                    text: 'Por favor, seleccione una categoría para su reclamo.',
+                    confirmButtonColor: '#0C2136'
+                });
+                return;
+            }
+
+            if (direccion === "") {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Dirección Requerida',
+                    text: 'Por favor, ingrese la ubicación o dirección del problema.',
+                    confirmButtonColor: '#0C2136'
+                });
+                return;
+            }
+
+            if (descripcion.length < 15) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Descripción muy corta',
+                    text: 'La descripción debe tener al menos 15 caracteres para procesar su solicitud correctamente.',
+                    confirmButtonColor: '#0C2136'
+                });
+                return;
+            }
+
+            // 2. Alerta de Confirmación Previa con SweetAlert2 (Respetando colores del Municipio)
+            Swal.fire({
+                title: '¿Confirmar envío del reclamo?',
+                text: "Su reporte será enviado al municipio para ser procesado.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0C2136',   /* Azul Marino */
+                cancelButtonColor: '#d33',
+                confirmButtonText: '<i class="fa-solid fa-check"></i> Sí, enviar',
+                cancelButtonText: 'Cancelar',
+                customClass: {
+                    popup: 'swal2-popup-serranoble'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Simulación / Procesamiento de envío
+                    Swal.fire({
+                        title: '¡Reclamo Registrado!',
+                        text: 'Su reclamo se ha guardado con éxito. Muchas gracias por colaborar con el municipio.',
+                        icon: 'success',
+                        confirmButtonColor: '#0C2136'
+                    }).then(() => {
+                        // Descomentar para envío real al backend Spring Boot
+                        // formReclamo.submit();
+                        formReclamo.reset();
+                        charCounter.textContent = '0 caracteres';
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
