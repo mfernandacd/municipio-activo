@@ -6,14 +6,18 @@ USE `Municipio-Activo`;
 
 CREATE TABLE IF NOT EXISTS reclamos (
     id BIGINT NOT NULL AUTO_INCREMENT,
-    categoria VARCHAR(50) NOT NULL,
-    direccion VARCHAR(255) NOT NULL,
-    google_maps_url VARCHAR(500),
-    descripcion TEXT NOT NULL,
-    imagen_path VARCHAR(255),
+    codigo_seguimiento VARCHAR(50) NOT NULL UNIQUE, -- 
+    usuario_id BIGINT,                              -- 
+    categoria VARCHAR(50) NOT NULL,                 -- Categoría del reclamo (Luminarias, Bacheo, Limpieza, Otros)
+    area_asignada VARCHAR(100),                     -- Área municipal 
+    direccion VARCHAR(255) NOT NULL,                -- 
+    google_maps_url VARCHAR(500),                   -- 
+    descripcion TEXT NOT NULL,                      -- 
+    imagen_path VARCHAR(255),                       --
     estado VARCHAR(20) NOT NULL DEFAULT 'PENDIENTE',
-    fecha_creacion DATETIME NOT NULL,
-    PRIMARY KEY (id)
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, --
+    PRIMARY KEY (id),
+    CONSTRAINT fk_reclamos_usuario FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS usuarios (
