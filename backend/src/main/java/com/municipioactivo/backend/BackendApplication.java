@@ -2,16 +2,13 @@ package com.municipioactivo.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-
+import org.springframework.scheduling.annotation.EnableAsync; // <-- Importación necesaria
 
 @SpringBootApplication
-// Punto de entrada que inicia la aplicación Spring Boot del backend.
+@EnableAsync // <-- Habilita el envío de mails en segundo plano
 public class BackendApplication {
 
-	// Inicia el contexto de Spring y pone en marcha la API REST.
-	public static void main(String[] args) {
-		SpringApplication.run(BackendApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(BackendApplication.class, args);
+    }
 }
