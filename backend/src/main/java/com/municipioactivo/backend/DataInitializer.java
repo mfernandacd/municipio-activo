@@ -1,45 +1,26 @@
 package com.municipioactivo.backend;
 
+import com.municipioactivo.backend.model.Reclamo;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-@Configuration
-// Carga los datos administrativos y de ejemplo cuando se inicia la aplicación.
-public class DataInitializer {
+@Component
+public class DataInitializer implements CommandLineRunner {
 
-    // Registra o actualiza el usuario administrador y crea reclamos iniciales si no existen.
-    @Bean
-    CommandLineRunner loadInitialData(
-            UsuarioRepository usuarioRepository,
-            ReclamoRepository reclamoRepository,
-            PasswordEncoder passwordEncoder) {
-        return args -> {
-                Usuario administrador = usuarioRepository.findByEmailIgnoreCase("admin@municipio.gob.ar")
-                        .orElseGet(() -> new Usuario(
-                                "admin@municipio.gob.ar",
-                                "",
-                                "Administrador Municipal"));
-                administrador.setPasswordHash(passwordEncoder.encode("Municipio123!"));
-                administrador.setNombre("Administrador Municipal");
-                administrador.setActivo(true);
-                usuarioRepository.save(administrador);
+    private final ReclamoRepository reclamoRepository;
 
-            if (reclamoRepository.count() == 0) {
-                reclamoRepository.save(new Reclamo(
-                        "Luminarias",
-                        "Av. San Martin 1234, Barrio Centro",
-                        "https://maps.google.com/",
-                        "La luminaria de la esquina permanece apagada durante la noche.",
-                        ""));
-                reclamoRepository.save(new Reclamo(
-                        "Bacheo",
-                        "Calle Belgrano 450, Barrio Norte",
-                        "",
-                        "Hay un bache grande que dificulta el paso de vehiculos y peatones.",
-                        ""));
-            }
-        };
+    public DataInitializer(ReclamoRepository reclamoRepository) {
+        this.reclamoRepository = reclamoRepository;
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        if (reclamoRepository.count() == 0) {
+            Reclamo reclamo1 = new Reclamo("Alumbrado roto", "Falta luz en la esquina", "vecino@mail.com", "REC-001");
+            Reclamo reclamo2 = new Reclamo("Bache en la calle", "Bache profundo frente a la plaza", "vecino2@mail.com", "REC-002");
+
+            reclamoRepository.save(reclamo1);
+            reclamoRepository.save(reclamo2);
+        }
     }
 }

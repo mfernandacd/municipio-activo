@@ -1,9 +1,8 @@
 package com.municipioactivo.backend;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.municipioactivo.backend.model.Reclamo;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -11,33 +10,31 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
-    private String mailFrom;
-
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
 
-    @Async
     public void enviarMailConfirmacion(Reclamo reclamo) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(mailFrom);
-        message.setTo(reclamo.getContribuyenteEmail());
-        message.setSubject("Confirmación de Reclamo - Código: " + reclamo.getCodigoSeguimiento());
+        if (reclamo.getEmailUsuario() == null || reclamo.getEmailUsuario().isBlank()) {
+            return;
+        }
 
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(reclamo.getEmailUsuario());
+        message.setSubject("Confirmación de Reclamo - Municipio Activo (" + reclamo.getCodigoSeguimiento() + ")");
+        
         String contenido = String.format(
             "Estimado/a contribuyente,\n\n" +
-            "Su reclamo ha sido registrado exitosamente.\n\n" +
-            "Resumen del reclamo:\n" +
-            "- Número de seguimiento: %s\n" +
-            "- Categoría: %s\n" +
-            "- Dirección: %s\n" +
-            "- Descripción: %s\n\n" +
-            "Conserve su número de seguimiento para posteriores consultas.\n\n" +
-            "Atentamente,\nAtención al Ciudadano",
+            "Se ha registrado exitosamente su reclamo en la plataforma Municipio Activo.\n\n" +
+            "📋 RESUMEN DE LA SOLICITUD:\n" +
+            "-------------------------------------------\n" +
+            "📌 Código de Seguimiento: %s\n" +
+            "📝 Detalle: %s\n" +
+            "-------------------------------------------\n\n" +
+            "Guarde este código para consultar el estado de su trámite en el portal web.\n\n" +
+            "Atentamente,\n" +
+            "Gestión Municipal - Municipio Activo",
             reclamo.getCodigoSeguimiento(),
-            reclamo.getCategoria(),
-            reclamo.getDireccion(),
             reclamo.getDescripcion()
         );
 

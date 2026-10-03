@@ -1,7 +1,9 @@
 package com.municipioactivo.backend;
 
+import com.municipioactivo.backend.model.Reclamo;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List; // <-- Agregar este import
 
 @Service
 public class ReclamoService {
@@ -18,16 +20,18 @@ public class ReclamoService {
         this.emailService = emailService;
     }
 
+    // Nuevo método para listar todos los reclamos registrados
+    @Transactional(readOnly = true)
+    public List<Reclamo> obtenerTodos() {
+        return reclamoRepository.findAll();
+    }
+
     @Transactional
     public Reclamo registrarReclamo(Reclamo reclamo) {
-        // 1. Generar e ingresar el código único de seguimiento
         String codigoUnico = generadorCodigoService.generarCodigoUnico();
         reclamo.setCodigoSeguimiento(codigoUnico);
 
-        // 2. Guardar en MySQL
         Reclamo reclamoGuardado = reclamoRepository.save(reclamo);
-
-        // 3. Enviar correo de confirmación de forma asíncrona
         emailService.enviarMailConfirmacion(reclamoGuardado);
 
         return reclamoGuardado;
