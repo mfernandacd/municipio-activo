@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 // Entidad JPA que representa un reclamo municipal en la base de datos.
 @Entity
@@ -22,13 +24,16 @@ public class Reclamo {
     private Long id;
 
     @NotBlank(message = "La categoría es obligatoria")
+    @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String categoria;
 
     @NotBlank(message = "La dirección es obligatoria")
+    @Size(max = 255)
     @Column(nullable = false, length = 255)
     private String direccion;
 
+    @Size(max = 500)
     @Column(name = "google_maps_url", length = 500)
     private String googleMapsUrl;
 
@@ -46,10 +51,16 @@ public class Reclamo {
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
+    @Column(name = "codigo_seguimiento", nullable = false, length = 20)
+    private String codigoSeguimiento;
+
     @PrePersist
-    // Asigna automáticamente la fecha de creación antes de insertar el reclamo.
+    // Asigna automáticamente la fecha de creación y el código de seguimiento antes de insertar el reclamo.
     protected void onCreate() {
         this.fechaCreacion = LocalDateTime.now();
+        if (this.codigoSeguimiento == null || this.codigoSeguimiento.isBlank()) {
+            this.codigoSeguimiento = UUID.randomUUID().toString().replace("-", "").substring(0, 12).toUpperCase();
+        }
     }
 
     public Reclamo() {}
@@ -86,6 +97,9 @@ public class Reclamo {
 
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
+    public String getCodigoSeguimiento() { return codigoSeguimiento; }
+    public void setCodigoSeguimiento(String codigoSeguimiento) { this.codigoSeguimiento = codigoSeguimiento; }
 }
 
 // Repositorio Spring Data que permite guardar y consultar reclamos.
@@ -139,6 +153,6 @@ class ReclamoServiceImpl implements ReclamoService {
     @Transactional(readOnly = true)
     // Normaliza el estado recibido y obtiene los reclamos correspondientes.
     public List<Reclamo> obtenerReclamosPorEstado(String estado) {
-        return reclamoRepository.findByEstado(estado.toUpperCase());
+        return reclamoRepository.findByEstado(estado.toUpperCase(Locale.ROOT));
     }
 }

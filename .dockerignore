@@ -1,0 +1,10 @@
+.git
+.github
+.vscode
+.idea
+**/target
+**/build
+frontend/Sql
+*.sql
+*.bat
+*.ps1

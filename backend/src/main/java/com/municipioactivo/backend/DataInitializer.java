@@ -3,29 +3,18 @@ package com.municipioactivo.backend;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
-// Carga los datos administrativos y de ejemplo cuando se inicia la aplicación.
+// Carga datos de ejemplo cuando se inicia la aplicación en desarrollo local.
 public class DataInitializer {
 
-    // Registra o actualiza el usuario administrador y crea reclamos iniciales si no existen.
+    // Crea reclamos de ejemplo en desarrollo, sin instalar cuentas con contraseñas conocidas.
     @Bean
+    @Profile("local")
     CommandLineRunner loadInitialData(
-            UsuarioRepository usuarioRepository,
-            ReclamoRepository reclamoRepository,
-            PasswordEncoder passwordEncoder) {
+            ReclamoRepository reclamoRepository) {
         return args -> {
-                Usuario administrador = usuarioRepository.findByEmailIgnoreCase("admin@municipio.gob.ar")
-                        .orElseGet(() -> new Usuario(
-                                "admin@municipio.gob.ar",
-                                "",
-                                "Administrador Municipal"));
-                administrador.setPasswordHash(passwordEncoder.encode("Municipio123!"));
-                administrador.setNombre("Administrador Municipal");
-                administrador.setActivo(true);
-                usuarioRepository.save(administrador);
-
             if (reclamoRepository.count() == 0) {
                 reclamoRepository.save(new Reclamo(
                         "Luminarias",

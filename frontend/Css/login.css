@@ -134,22 +134,10 @@ header .navbar {
 .login-options {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1rem;
     margin: 0.5rem 0 1.25rem;
     font-size: 0.88rem;
-}
-
-.remember-me {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    color: var(--color-text-muted);
-}
-
-.remember-me input {
-    accent-color: var(--color-primary);
 }
 
 .forgot-link {
@@ -182,6 +170,51 @@ header .navbar {
     box-shadow: 0 12px 24px rgba(13, 31, 45, 0.18);
 }
 
+.btn-register {
+    border-radius: var(--radius-md);
+    border: 1.5px solid rgba(13, 31, 45, 0.3);
+    background: rgba(13, 31, 45, 0.03);
+    color: var(--color-primary);
+    font-weight: 700;
+    padding: 0.85rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.btn-register:hover,
+.btn-register:focus-visible {
+    background: var(--color-primary);
+    color: var(--color-white);
+    border-color: var(--color-primary);
+    box-shadow: 0 10px 20px rgba(13, 31, 45, 0.12);
+}
+
+.form-text {
+    margin-top: 0.45rem;
+    color: var(--color-text-muted) !important;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.invalid-feedback {
+    display: none !important;
+    min-height: 1.25rem;
+    margin-top: 0.35rem;
+    font-size: 0.76rem;
+    color: #dc3545;
+}
+
+.form-control.is-invalid ~ .invalid-feedback,
+.form-control.is-invalid + .invalid-feedback,
+.form-control:invalid ~ .invalid-feedback,
+.form-control:invalid + .invalid-feedback {
+    display: block !important;
+}
+
+.form-control.is-valid ~ .invalid-feedback,
+.form-control.is-valid + .invalid-feedback {
+    display: none !important;
+}
+
 .login-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
@@ -205,10 +238,20 @@ header .navbar {
 }
 
 footer {
-    background-color: #211a1f !important;
+    background: linear-gradient(180deg, #1d232b 0%, #12181f 100%);
     color: #fff;
     font-size: 0.9rem;
     border-top: 3px solid var(--color-accent);
+}
+
+footer h5,
+footer h6 {
+    color: #ffffff;
+}
+
+footer p {
+    color: rgba(255, 255, 255, 0.82);
+    margin-bottom: 0.35rem;
 }
 
 @media (max-width: 576px) {
@@ -218,7 +261,7 @@ footer {
 
     .login-options {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: flex-end;
     }
 }
 /* ==========================================================
