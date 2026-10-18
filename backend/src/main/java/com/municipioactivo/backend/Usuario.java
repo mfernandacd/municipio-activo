@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 @Entity
 @Table(name = "usuarios")
-// Entidad JPA que representa a los usuarios administrativos del sistema.
+// Entidad JPA que representa a los usuarios del sistema.
 public class Usuario {
 
     @Id
@@ -28,6 +28,12 @@ public class Usuario {
     @Column(nullable = false, length = 120)
     private String nombre;
 
+    @Column(nullable = false, length = 30)
+    private String rol = "ciudadano";
+
+    @Column(length = 255)
+    private String privilegios = "";
+
     @Column(nullable = false)
     private boolean activo = true;
 
@@ -36,10 +42,17 @@ public class Usuario {
     }
 
     public Usuario(String email, String passwordHash, String nombre) {
-        // Crea un usuario con sus datos básicos y contraseña ya cifrada.
         this.email = email;
         this.passwordHash = passwordHash;
         this.nombre = nombre;
+    }
+
+    public Usuario(String email, String passwordHash, String nombre, String rol, String privilegios) {
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.nombre = nombre;
+        this.rol = rol;
+        this.privilegios = privilegios;
     }
 
     public Long getId() {
@@ -50,24 +63,44 @@ public class Usuario {
         return email;
     }
 
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public boolean isActivo() {
-        return activo;
     }
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }
 
+    public String getNombre() {
+        return nombre;
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public String getPrivilegios() {
+        return privilegios;
+    }
+
+    public void setPrivilegios(String privilegios) {
+        this.privilegios = privilegios;
+    }
+
+    public boolean isActivo() {
+        return activo;
     }
 
     public void setActivo(boolean activo) {

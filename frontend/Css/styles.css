@@ -13,10 +13,30 @@
 body {
     font-family: var(--font-family-base);
     color: var(--color-text-dark);
-    background-color: #ffffff;
+    background: linear-gradient(180deg, #f8fbff 0%, #edf3f8 100%);
     min-height: 100vh;
     display: flex; /* Establece la estructura vertical de la página */
     flex-direction: column; /* Mantiene el footer pegado al fondo incluso con poco contenido */
+}
+
+main .container {
+    max-width: 1200px;
+}
+
+.home-zone {
+    margin-bottom: 2rem;
+    padding: clamp(1rem, 3vw, 2rem);
+    border: 1px solid #dbe4ed;
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 8px 24px rgba(13, 31, 45, 0.06);
+}
+
+.zona-principal {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
 }
 
 /* ==========================================================
@@ -60,9 +80,30 @@ main {
 }
 
 footer {
-    background-color: #211a1f !important;
+    background: linear-gradient(180deg, #1d232b 0%, #12181f 100%);
     font-size: 0.9rem;
     border-top: 3px solid var(--color-accent); /* Línea superior de acento para diferenciar el pie de página */
+}
+
+footer h5,
+footer h6 {
+    color: #ffffff;
+}
+
+footer p {
+    color: rgba(255, 255, 255, 0.82);
+    margin-bottom: 0.35rem;
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+}
+
+.dropdown-item:hover {
+    background-color: #eef5ff;
+    color: var(--color-primary);
 }
 
 /* ==========================================================
@@ -75,12 +116,23 @@ footer {
 
 /* Tarjetas principales para las noticias destacadas en la portada */
 .card-principal {
-    border: 2px solid #198754;
+    border: 2px solid #1f5fbf;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 18px 35px rgba(13, 31, 45, 0.10);
 }
 
 .card-principal img {
-    height: 220px;
+    height: 420px;
     object-fit: cover;
+}
+
+.card-principal .card-body {
+    padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.card-principal .card-footer {
+    padding: 0 1.5rem 1.25rem;
 }
 
 /* Noticias secundarias con desplazamiento horizontal para mostrar varios items en una fila */

@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Municipio Activo - Serranoble</title>
+    <title>Municipio Serranoble</title>
+    <meta name="municipio-api-base-url" content="">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="Css/styles.css">
 </head>
@@ -15,7 +16,7 @@
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="index.html">
                     <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
-                    <span>Municipio Activo</span>
+                    <span>Municipio Serranoble</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -23,16 +24,22 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" href="index.html">Inicio</a>
+                            <a class="nav-link active" href="#principal">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#novedades-principales">Noticias</a>
+                            <a class="nav-link" href="#noticias">Noticias</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="reclamosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Reclamos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="reclamosDropdown">
+                                <li><a class="dropdown-item" href="reclamos-municipal.html">Nuevo</a></li>
+                                <li><a class="dropdown-item" href="#tramites">Seguimiento</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#tramites">Trámites / Reclamos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="btn btn-outline-light ms-2" href="login.html">Iniciar Sesión</a>
+                            <a class="btn btn-outline-light ms-2" href="login.html" data-auth-link>Iniciar Sesión</a>
                         </li>
                     </ul>
                 </div>
@@ -43,129 +50,111 @@
     <!-- Contenido principal de la página: aquí se agrupan las secciones informativas del sitio -->
     <main class="container my-4">
 
-    <!-- Sección 1: novedades principales con dos tarjetas destacadas para noticias de mayor relevancia -->
-    <section id="novedades-principales" class="mb-5">
-        <h2 class="text-center fw-bold text-uppercase mb-4 title-section">Novedades Principales</h2>
-        <div class="row g-4">
-            <!-- Noticia Principal 1 -->
-            <div class="col-md-6">
-                <div class="card card-principal h-100 shadow-sm">
-                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top p-2" alt="Noticia Principal 1">
-                    <div class="card-body">
-                        <p class="card-text fw-bold">La Municipalidad despliega una agenda semanal con capacitaciones y acciones en terreno.</p>
-                    </div>
-                    <div class="card-footer bg-transparent border-0 text-end pb-3">
-                        <a href="index.html#novedades-principales" class="btn btn-success btn-sm px-3">Ampliar</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Noticia Principal 2 -->
-            <div class="col-md-6">
-                <div class="card card-principal h-100 shadow-sm">
-                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top p-2" alt="Noticia Principal 2">
-                    <div class="card-body">
-                        <p class="card-text fw-bold">La Muni Más Cerca llegó al barrio Los Fresnos en su edición 111.</p>
-                    </div>
-                    <div class="card-footer bg-transparent border-0 text-end pb-3">
-                        <a href="index.html#novedades-principales" class="btn btn-success btn-sm px-3">Ampliar</a>
+    <div class="home-zone zona-principal" id="principal">
+        <section class="mb-5">
+            <h2 class="text-center fw-bold text-uppercase mb-4 title-section">Bienvenidos</h2>
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="card card-principal h-100 shadow-sm overflow-hidden">
+                        <img src="assets/imagenes/Logo.jpeg" class="card-img-top p-2" alt="Noticia Principal">
+                        <div class="card-body">
+                            <p class="card-text fw-bold fs-4">La Municipalidad despliega una agenda semanal con capacitaciones, servicios en terreno y nuevas acciones de fortalecimiento barrial para toda la comunidad.</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 text-end pb-3">
+                            <a href="#noticias" class="btn btn-success btn-sm px-3">Ampliar</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
-    <!-- Sección 2: noticias secundarias presentadas en un carrusel horizontal para mantener el contenido visible y ordenado -->
-    <section id="noticias-secundarias" class="mb-5">
-        <!-- Contenedor Deslizable Horizontalmente -->
-        <div class="carousel-noticias d-flex gap-3 overflow-x-auto pb-3">
-            <!-- Tarjeta Secundaria 1 -->
-            <div class="card card-secundaria shadow-sm flex-shrink-0">
-                <span class="badge bg-primary position-absolute top-0 start-0 m-2">La Muni Más Cerca</span>
-                <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 1">
-                <div class="card-body">
-                    <p class="card-text small fw-semibold">La Muni Más Cerca llegó al barrio El Hornero en su edición 109.</p>
+    <div class="home-zone zona-noticias" id="noticias">
+        <section class="mb-5" aria-labelledby="titulo-noticias">
+            <h2 id="titulo-noticias" class="text-center fw-bold text-uppercase mb-4 title-section">Noticias</h2>
+            <div id="noticias-secundarias" class="carousel-noticias d-flex gap-3 overflow-x-auto pb-3">
+                <div class="card card-secundaria shadow-sm flex-shrink-0">
+                    <span class="badge bg-primary position-absolute top-0 start-0 m-2">La Muni Más Cerca</span>
+                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 1">
+                    <div class="card-body">
+                        <p class="card-text small fw-semibold">La Muni Más Cerca llegó al barrio El Hornero en su edición 109.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-end">
+                        <a href="#noticias" class="btn btn-primary btn-sm">Ampliar</a>
+                    </div>
                 </div>
-                <div class="card-footer bg-transparent border-0 text-end">
-                    <a href="index.html#novedades-principales" class="btn btn-primary btn-sm">Ampliar</a>
+                <div class="card card-secundaria shadow-sm flex-shrink-0">
+                    <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Actividades</span>
+                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 2">
+                    <div class="card-body">
+                        <p class="card-text small fw-semibold">La Municipalidad presenta la agenda de actividades para esta semana.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-end">
+                        <a href="#noticias" class="btn btn-primary btn-sm">Ampliar</a>
+                    </div>
                 </div>
-            </div>
-            <!-- Tarjeta Secundaria 2 -->
-            <div class="card card-secundaria shadow-sm flex-shrink-0">
-                <span class="badge bg-info text-dark position-absolute top-0 start-0 m-2">Actividades</span>
-                <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 2">
-                <div class="card-body">
-                    <p class="card-text small fw-semibold">La Municipalidad presenta la agenda de actividades para esta semana.</p>
+                <div class="card card-secundaria shadow-sm flex-shrink-0">
+                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">Gestión</span>
+                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 3">
+                    <div class="card-body">
+                        <p class="card-text small fw-semibold">La Municipalidad firmó un convenio para construir 100 viviendas.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-end">
+                        <a href="#noticias" class="btn btn-primary btn-sm">Ampliar</a>
+                    </div>
                 </div>
-                <div class="card-footer bg-transparent border-0 text-end">
-                    <a href="index.html#novedades-principales" class="btn btn-primary btn-sm">Ampliar</a>
-                </div>
-            </div>
-            <!-- Tarjeta Secundaria 3 -->
-            <div class="card card-secundaria shadow-sm flex-shrink-0">
-                <span class="badge bg-danger position-absolute top-0 start-0 m-2">Gestión</span>
-                <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 3">
-                <div class="card-body">
-                    <p class="card-text small fw-semibold">La Municipalidad firmó un convenio para construir 100 viviendas.</p>
-                </div>
-                <div class="card-footer bg-transparent border-0 text-end">
-                    <a href="index.html#novedades-principales" class="btn btn-primary btn-sm">Ampliar</a>
-                </div>
-            </div>
-            <!-- Tarjeta Secundaria 4 -->
-            <div class="card card-secundaria shadow-sm flex-shrink-0">
-                <span class="badge bg-secondary position-absolute top-0 start-0 m-2">Comunidad</span>
-                <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 4">
-                <div class="card-body">
-                    <p class="card-text small fw-semibold">Gatos en adopción, la nueva jornada de tenencia responsable.</p>
-                </div>
-                <div class="card-footer bg-transparent border-0 text-end">
-                    <a href="index.html#novedades-principales" class="btn btn-primary btn-sm">Ampliar</a>
+                <div class="card card-secundaria shadow-sm flex-shrink-0">
+                    <span class="badge bg-secondary position-absolute top-0 start-0 m-2">Comunidad</span>
+                    <img src="assets/imagenes/Logo.jpeg" class="card-img-top pt-4 px-2" alt="Noticia 4">
+                    <div class="card-body">
+                        <p class="card-text small fw-semibold">Gatos en adopción, la nueva jornada de tenencia responsable.</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 text-end">
+                        <a href="#noticias" class="btn btn-primary btn-sm">Ampliar</a>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Botón Ver Más -->
-        <div class="text-center mt-4">
-            <a href="index.html#novedades-principales" class="btn btn-outline-primary btn-lg fw-bold px-4">Ver más noticias</a>
-        </div>
-    </section>
+            <div class="text-center mt-4">
+                <a href="#noticias" class="btn btn-outline-primary btn-lg fw-bold px-4">Ver más noticias</a>
+            </div>
+        </section>
+    </div>
 
-    <!-- Sección 3: trámites y servicios disponibles para ciudadanos, con acceso rápido a reclamos, consultas y seguimiento -->
-    <section id="tramites" class="my-5 py-4 bg-light rounded text-center">
-        <h2 class="fw-bold text-uppercase mb-4 title-section">Trámites y Servicios</h2>
-        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center px-3">
-            <!-- Opción 1: Nuevo Reclamo -->
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 py-3">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">Nuevo Reclamo</h5>
-                        <p class="card-text small text-muted">Inicia una solicitud o reporte sobre alumbrado, bacheo o limpieza.</p>
-                        <a href="reclamos-municipal.html" class="btn btn-primary mt-2">Ingresar</a>
+    <div class="home-zone zona-tramites" id="tramites">
+        <section class="my-5 py-4 text-center" aria-labelledby="titulo-tramites">
+            <h2 id="titulo-tramites" class="fw-bold text-uppercase mb-4 title-section">Trámites y Servicios</h2>
+            <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center px-3">
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 py-3">
+                        <div class="card-body">
+                            <h3 class="h5 card-title fw-bold">Nuevo Reclamo</h3>
+                            <p class="card-text small text-muted">Inicia una solicitud o reporte sobre alumbrado, bacheo o limpieza.</p>
+                            <a href="reclamos-municipal.html" class="btn btn-primary mt-2">Ingresar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0 py-3">
+                        <div class="card-body">
+                            <h3 class="h5 card-title fw-bold">Seguimiento de Reclamo</h3>
+                            <p class="card-text small text-muted">Consulta el estado actual del reclamo ingresado previamente.</p>
+                            <a href="login.html" class="btn btn-primary mt-2">Consultar</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" id="servicios">
+                    <div class="card h-100 shadow-sm border-0 py-3">
+                        <div class="card-body">
+                            <h3 class="h5 card-title fw-bold">Consultas Generales</h3>
+                            <p class="card-text small text-muted">Información sobre licencias, tasas municipales y servicios públicos.</p>
+                            <a href="#servicios" class="btn btn-primary mt-2">Ver Servicios</a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <!-- Opción 2: Seguimiento de Reclamo -->
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 py-3">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">Seguimiento de Reclamo</h5>
-                        <p class="card-text small text-muted">Consulta el estado actual del reclamo ingresado previamente.</p>
-                        <a href="index.html#tramites" class="btn btn-primary mt-2">Consultar</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Opción 3: Consultas y Servicios -->
-            <div class="col">
-                <div class="card h-100 shadow-sm border-0 py-3">
-                    <div class="card-body">
-                        <h5 class="card-title fw-bold">Consultas Generales</h5>
-                        <p class="card-text small text-muted">Información sobre licencias, tasas municipales y servicios públicos.</p>
-                        <a href="index.html#tramites" class="btn btn-primary mt-2">Ver Servicios</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+        </section>
+    </div>
 
 </main>
 
@@ -183,7 +172,7 @@
     <div class="panel-accesibilidad-header">
         <div class="panel-icono" aria-hidden="true">&#9733;</div>
         <h2 id="titulo-accesibilidad">Ajustes de Accesibilidad</h2>
-        <p>Desarrollado para Municipio Activo · Ocultar barra de herramientas</p>
+        <p>Desarrollado para Municipio Serranoble · Ocultar barra de herramientas</p>
     </div>
     <div class="panel-accesibilidad-body">
         <section class="accesibilidad-seccion" aria-labelledby="contenido-accesibilidad">

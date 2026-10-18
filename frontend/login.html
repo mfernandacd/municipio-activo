@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Municipio Activo - Iniciar sesión</title>
+    <title>Municipio Serranoble - Iniciar sesión</title>
     <!-- Bootstrap CSS (v5.3.2) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Estilo personalizado -->
     <link rel="stylesheet" href="Css/login.css">
+    <meta name="municipio-api-base-url" content="">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
@@ -19,7 +20,7 @@
             <div class="container">
                 <a class="navbar-brand d-flex align-items-center" href="index.html">
                     <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
-                    <span>Municipio Activo</span>
+                    <span>Municipio Serranoble</span>
                 </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
@@ -27,9 +28,9 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link" href="index.html">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="index.html#novedades-principales">Noticias</a></li>
+                        <li class="nav-item"><a class="nav-link" href="index.html#noticias">Noticias</a></li>
                         <li class="nav-item"><a class="nav-link" href="index.html#tramites">Trámites</a></li>
-                        <li class="nav-item"><a class="btn btn-outline-light ms-2" href="login.html">Ingresar</a></li>
+                        <li class="nav-item"><a class="btn btn-outline-light ms-2" href="login.html" data-auth-link>Ingresar</a></li>
                     </ul>
                 </div>
             </div>
@@ -41,7 +42,7 @@
         <section class="login-card card p-4 shadow-sm" style="max-width: 400px; width: 100%; border-radius: 12px;" aria-labelledby="titulo-login">
             <!-- Identidad visual del formulario -->
             <div class="login-brand text-center mb-3">
-                <img src="assets/imagenes/Logo.jpeg" alt="Logo de Municipio Activo" class="login-logo img-fluid mb-2" style="max-height: 80px;">
+                <img src="assets/imagenes/Logo.jpeg" alt="Logo de Municipio Serranoble" class="login-logo img-fluid mb-2" style="max-height: 80px;">
                 <h2 id="titulo-login" class="h4">Iniciar sesión</h2>
             </div>
 
@@ -54,31 +55,30 @@
             <form id="login-form" class="login-form" action="index.html" method="post" novalidate>
                 <div class="mb-3">
                     <label for="usuario" class="form-label">Correo electrónico / Usuario</label>
-                    <input type="email" class="form-control" id="usuario" name="usuario" placeholder="usuario@municipio.gob.ar" autocomplete="username" required>
+                    <input type="email" class="form-control" id="usuario" name="usuario" placeholder="usuario@correo.com" autocomplete="username" required>
                     <div id="usuario-error" class="invalid-feedback">Ingresá un correo electrónico válido.</div>
                 </div>
 
                 <div class="mb-3">
                     <label for="password" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
-                    <div id="password-error" class="invalid-feedback">Ingresá tu contraseña.</div>
+                    <input type="password" class="form-control" id="password" name="password" minlength="6" maxlength="8" pattern="[A-Za-z0-9]{6,8}" title="Usá de 6 a 8 letras o números, sin caracteres especiales." autocomplete="current-password" required>
+                    <div id="password-error" class="invalid-feedback">Usá de 6 a 8 letras o números, sin caracteres especiales.</div>
                 </div>
 
-                <!-- Opciones para recordar la sesión y recuperar el acceso -->
-                <div class="login-options d-flex justify-content-between align-items-center mb-3">
-                    <label class="remember-me form-check-label small">
-                        <input type="checkbox" class="form-check-input me-1">
-                        <span>Recordarme</span>
-                    </label>
-                    <a href="index.html#tramites" class="forgot-link small">¿Olvidaste tu contraseña?</a>
+                <!-- Enlace de recuperación asistida -->
+                <div class="login-options d-flex align-items-center mb-3">
+                    <a href="mailto:info@serranoble.gob.ar?subject=Recuperaci%C3%B3n%20de%20contrase%C3%B1a" class="forgot-link small">¿Olvidaste tu contraseña? Contactá al municipio.</a>
                 </div>
 
-                <button type="submit" class="btn btn-primary btn-login w-100">Ingresar</button>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-login w-100">Ingresar</button>
+                    <button type="button" class="btn btn-outline-primary btn-register w-100" data-bs-toggle="modal" data-bs-target="#registroModal">Registrarse</button>
+                </div>
             </form>
 
             <!-- Enlace para solicitar ayuda -->
             <div class="login-footer text-center mt-3">
-                <p class="small mb-0">¿Necesitás acceso? <a href="index.html#tramites">Solicitar ayuda</a></p>
+                <p class="small mb-0">¿Necesitás acceso? <a href="mailto:info@serranoble.gob.ar?subject=Ayuda%20para%20acceder">Solicitar ayuda</a></p>
             </div>
         </section>
     </main>
@@ -97,7 +97,7 @@
         <div class="panel-accesibilidad-header">
             <div class="panel-icono" aria-hidden="true">&#9733;</div>
             <h2 id="titulo-accesibilidad">Ajustes de Accesibilidad</h2>
-            <p>Desarrollado para Municipio Activo · Ocultar barra de herramientas</p>
+            <p>Desarrollado para Municipio Serranoble · Ocultar barra de herramientas</p>
         </div>
         <div class="panel-accesibilidad-body">
             <section class="accesibilidad-seccion" aria-labelledby="contenido-accesibilidad">
@@ -147,10 +147,63 @@
         <img src="https://www.munichile.cl/wp-content/plugins/accessibility-onetap/assets/images/admin/Original_Logo_Icon.svg" alt="Icono de accesibilidad">
     </button>
 
+    <!-- Modal para crear un nuevo usuario -->
+    <div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="registroModalLabel">Crear nuevo usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <form id="registro-form" novalidate>
+                    <div class="modal-body pt-2">
+                        <div class="mb-3">
+                            <label for="registroNombre" class="form-label">Nombre completo</label>
+                            <input type="text" class="form-control" id="registroNombre" name="registroNombre" placeholder="Juan Pérez" required>
+                            <div class="invalid-feedback">Ingresá tu nombre completo.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroEmail" class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" id="registroEmail" name="registroEmail" placeholder="usuario@correo.com" autocomplete="email" required>
+                            <div class="invalid-feedback">Ingresá un correo electrónico válido.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="registroPassword" name="registroPassword" minlength="6" maxlength="8" pattern="[A-Za-z0-9]{6,8}" title="Usá de 6 a 8 letras o números, sin caracteres especiales." autocomplete="new-password" required>
+                            <div class="invalid-feedback">Usá de 6 a 8 letras o números, sin caracteres especiales.</div>
+                        </div>
+                        <p class="small text-muted mb-0">Los nuevos usuarios se registran como ciudadanos. Los permisos administrativos se asignan desde la base de datos.</p>
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Crear usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Pie de página con información institucional -->
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
+    <footer class="bg-dark text-white py-4 mt-auto">
         <div class="container">
-            <p class="mb-0">&copy; 2026 Municipio Serranoble - Todos los derechos reservados</p>
+            <div class="row text-center text-md-start g-3 align-items-center">
+                <div class="col-md-4">
+                    <h5 class="fw-bold mb-2">Municipio Serranoble</h5>
+                    <p class="mb-1">Atención al ciudadano</p>
+                    <p class="mb-0">Comprometidos con la comunidad y el servicio público.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-bold mb-2">Ubicación</h6>
+                    <p class="mb-1">Av. Principal 123</p>
+                    <p class="mb-0">Serranoble, Provincia</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="fw-bold mb-2">Contacto</h6>
+                    <p class="mb-1">Tel: (0341) 456-7890</p>
+                    <p class="mb-0">info@serranoble.gob.ar</p>
+                </div>
+            </div>
+            <p class="mb-0 mt-4 text-center">&copy; 2026 Municipio Serranoble - Todos los derechos reservados</p>
         </div>
     </footer>
 

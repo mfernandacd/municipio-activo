@@ -1,0 +1,43 @@
+<div class="tracking-container container my-4">
+  <h2>Consultar Estado de Reclamo</h2>
+  <p class="text-muted">Ingresá tu código de seguimiento para conocer el estado actual de tu solicitud.</p>
+
+  <!-- Formulario de búsqueda -->
+  <form id="tracking-form" class="row g-3">
+    <div class="col-md-8">
+      <input 
+        type="text" 
+        id="codigo-seguimiento" 
+        class="form-control" 
+        placeholder="Ej. REC-8492" 
+        required
+      >
+    </div>
+    <div class="col-md-4">
+      <button type="submit" id="btn-consultar" class="btn btn-primary w-100">Consultar</button>
+    </div>
+  </form>
+
+  <!-- Indicador visual de carga -->
+  <div id="loading-indicator" class="d-none text-muted mt-3">
+    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    Consultando...
+  </div>
+
+  <!-- Mensaje de error amigable -->
+  <div id="error-message" class="alert alert-warning d-none mt-3" role="alert"></div>
+
+  <!-- Tarjeta de resultados -->
+  <div id="result-card" class="card d-none mt-4 shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-3">Detalles del Reclamo</h5>
+      <ul class="list-unstyled mb-0">
+        <li class="mb-2"><strong>ID / Código:</strong> <span id="res-id"></span></li>
+        <li class="mb-2"><strong>Categoría:</strong> <span id="res-categoria"></span></li>
+        <li class="mb-2"><strong>Dirección:</strong> <span id="res-direccion"></span></li>
+        <li class="mb-2"><strong>Descripción:</strong> <span id="res-descripcion"></span></li>
+        <li class="mb-0"><strong>Estado Actual:</strong> <span id="res-estado" class="badge"></span></li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="panel-accesibilidad-header">
                     <div class="panel-icono" aria-hidden="true">&#9733;</div>
                     <h2 id="titulo-accesibilidad">Ajustes de Accesibilidad</h2>
-                    <p>Desarrollado para Municipio Activo</p>
+                    <p>Desarrollado para Municipio Serranoble</p>
                 </div>
                 <div class="panel-accesibilidad-body">
                     <section class="accesibilidad-seccion" aria-labelledby="contenido-accesibilidad">
