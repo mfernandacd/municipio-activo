@@ -6,9 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 @Entity
 @Table(name = "usuarios")
@@ -106,11 +103,4 @@ public class Usuario {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-}
-
-@Repository
-// Repositorio para buscar usuarios por correo y estado de activación.
-interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    Optional<Usuario> findByEmailIgnoreCase(String email);
-    Optional<Usuario> findByEmailIgnoreCaseAndActivoTrue(String email);
 }

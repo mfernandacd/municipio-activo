@@ -2,9 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const authLink = document.querySelector('[data-auth-link]');
     const authContainer = authLink?.parentElement;
 
-    if (!authLink || !authContainer) return;
-
-    sincronizarSesion();
+    window.municipioSessionReady = sincronizarSesion();
 
     async function sincronizarSesion() {
         try {
@@ -14,7 +12,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 401) {
                 localStorage.removeItem('usuarioMunicipio');
-                return;
+                protegerAdministracion(null);
+                return null;
             }
             if (!response.ok) {
                 throw new Error(`La API respondió con el error ${response.status}.`);
@@ -23,9 +22,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const usuario = await response.json();
             usuario.privilegios = normalizarPrivilegios(usuario.privilegios);
             localStorage.setItem('usuarioMunicipio', JSON.stringify(usuario));
-            mostrarSesionIniciada(usuario);
+            if (authLink && authContainer) {
+                mostrarSesionIniciada(usuario);
+            }
+            protegerAdministracion(usuario);
+            return usuario;
         } catch (error) {
             console.error('No se pudo comprobar la sesión del usuario.', error);
+            protegerAdministracion(null);
+            return null;
+        }
+    }
+
+    function protegerAdministracion(usuario) {
+        const esAdministrativo = usuario?.rol?.toLowerCase() === 'administrativo';
+        document.querySelectorAll('[data-admin-only]').forEach((element) => {
+            element.hidden = !esAdministrativo;
+        });
+
+        if (document.body.hasAttribute('data-admin-page') && !esAdministrativo) {
+            window.location.replace('noticias.html');
         }
     }
 

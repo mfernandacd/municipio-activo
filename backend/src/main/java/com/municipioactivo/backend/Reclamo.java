@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 // Entidad JPA que representa un reclamo municipal en la base de datos.
@@ -107,6 +108,8 @@ public class Reclamo {
 interface ReclamoRepository extends JpaRepository<Reclamo, Long> {
     // Busca reclamos que tengan el estado indicado.
     List<Reclamo> findByEstado(String estado);
+
+    Optional<Reclamo> findByCodigoSeguimientoIgnoreCase(String codigoSeguimiento);
 }
 
 // Define las operaciones de negocio disponibles para los reclamos.
@@ -115,6 +118,7 @@ interface ReclamoService {
     List<Reclamo> obtenerTodosLosReclamos();
     List<Reclamo> obtenerReclamosPendientes();
     List<Reclamo> obtenerReclamosPorEstado(String estado);
+    Optional<Reclamo> buscarPorCodigoSeguimiento(String codigoSeguimiento);
 }
 
 // Implementa la lógica de negocio delegando la persistencia en el repositorio.
@@ -154,5 +158,11 @@ class ReclamoServiceImpl implements ReclamoService {
     // Normaliza el estado recibido y obtiene los reclamos correspondientes.
     public List<Reclamo> obtenerReclamosPorEstado(String estado) {
         return reclamoRepository.findByEstado(estado.toUpperCase(Locale.ROOT));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Reclamo> buscarPorCodigoSeguimiento(String codigoSeguimiento) {
+        return reclamoRepository.findByCodigoSeguimientoIgnoreCase(codigoSeguimiento);
     }
 }

@@ -2,10 +2,13 @@ package com.municipioactivo.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,5 +60,38 @@ class ReclamoControllerTests {
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(reclamoService, never()).guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class));
+    }
+
+    @Test
+    void updatesClaimWithSupportedState() {
+        Reclamo reclamo = new Reclamo("Bacheo", "Calle Belgrano 450", "", "Hay un bache que dificulta el paso.", "");
+        reclamo.setId(12L);
+        when(reclamoService.obtenerTodosLosReclamos()).thenReturn(List.of(reclamo));
+        when(reclamoService.guardarReclamo(any(Reclamo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("en_proceso"));
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("EN_PROCESO", response.getBody().getEstado());
+        verify(reclamoService).guardarReclamo(reclamo);
+    }
+
+    @Test
+    void rejectsUnsupportedClaimState() {
+        var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("CANCELADO"));
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        verify(reclamoService, never()).obtenerTodosLosReclamos();
+        verify(reclamoService, never()).guardarReclamo(any(Reclamo.class));
+    }
+
+    @Test
+    void returnsNotFoundWhenClaimDoesNotExist() {
+        when(reclamoService.obtenerTodosLosReclamos()).thenReturn(List.of());
+
+        var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("RESUELTO"));
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        verify(reclamoService, never()).guardarReclamo(any(Reclamo.class));
     }
 }
