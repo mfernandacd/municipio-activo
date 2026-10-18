@@ -55,7 +55,11 @@ class BackendApplicationTests {
 				"/reclamos-municipal.html", "/seguimiento.html", "/servicios.html"
 		}) {
 			var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + page)).GET().build();
-			assertEquals(200, client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode(), page);
+			var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			assertEquals(200, response.statusCode(), page);
+			if (page.equals("/seguimiento.html")) {
+				assertTrue(response.body().contains("tracking-form"));
+			}
 		}
 	}
 

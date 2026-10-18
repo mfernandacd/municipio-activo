@@ -6,12 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const errorMessage = document.getElementById('error-message');
   const resultCard = document.getElementById('result-card');
 
-  // Elementos de detalle dentro de la tarjeta
   const resId = document.getElementById('res-id');
   const resCategoria = document.getElementById('res-categoria');
-  const resDireccion = document.getElementById('res-direccion');
-  const resDescripcion = document.getElementById('res-descripcion');
   const resEstado = document.getElementById('res-estado');
+  const resFecha = document.getElementById('res-fecha');
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -29,8 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     inputCodigo.disabled = true;
 
     try {
-      // 3. Petición HTTP GET al servidor
-      const response = await fetch(`/api/reclamos/${encodeURIComponent(codigo)}`, {
+      const response = await fetch(`/api/reclamos/seguimiento/${encodeURIComponent(codigo)}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'
@@ -38,7 +35,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (!response.ok) {
-        // Manejo específico si no se encuentra o hay error en el servidor
         if (response.status === 404) {
           throw new Error('No encontramos ningún reclamo asociado al código ingresado. Por favor, revisá los dígitos e intentalo nuevamente.');
         } else {
@@ -48,41 +44,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const data = await response.json();
 
-      // 4. Inyectar datos en el HTML dinámicamente
-      resId.textContent = data.id || codigo;
+      resId.textContent = data.codigoSeguimiento || codigo;
       resCategoria.textContent = data.categoria || 'No especificada';
-      resDireccion.textContent = data.direccion || 'No especificada';
-      resDescripcion.textContent = data.descripcion || 'Sin descripción detallada';
-      resEstado.textContent = data.estado;
-      
-      // Aplicar color dinámico al badge según el estado
-      resEstado.className = 'badge ' + obtenerClaseEstado(data.estado);
+      resEstado.textContent = formatearEstado(data.estado);
+      resEstado.className = `badge ${obtenerClaseEstado(data.estado)}`;
+      resFecha.textContent = data.fechaCreacion
+        ? new Date(data.fechaCreacion).toLocaleString('es-AR')
+        : 'No disponible';
 
-      // Mostrar la tarjeta de resultados
       resultCard.classList.remove('d-none');
 
     } catch (error) {
-      // 5. Presentar aviso claro al usuario omitiendo términos técnicos
-      errorMessage.textContent = error.message;
+      errorMessage.textContent = error instanceof TypeError
+        ? 'No pudimos conectarnos con el servicio. Revisá tu conexión e intentá nuevamente.'
+        : error.message;
       errorMessage.classList.remove('d-none');
     } finally {
-      // 6. Desactivar carga y restaurar controles
       loadingIndicator.classList.add('d-none');
       btnConsultar.disabled = false;
       inputCodigo.disabled = false;
     }
   });
 
-  // Función auxiliar para estilos visuales del estado
   function obtenerClaseEstado(estado) {
-    switch (estado.toLowerCase()) {
-      case 'resuelto':
+    switch (estado?.toUpperCase()) {
+      case 'RESUELTO':
         return 'bg-success';
-      case 'en proceso':
+      case 'EN_PROCESO':
         return 'bg-warning text-dark';
-      case 'pendiente':
+      case 'PENDIENTE':
       default:
         return 'bg-secondary';
     }
+  }
+
+  function formatearEstado(estado) {
+    return estado === 'EN_PROCESO' ? 'En proceso' : estado?.toLowerCase().replace(/^./, letra => letra.toUpperCase());
   }
 });

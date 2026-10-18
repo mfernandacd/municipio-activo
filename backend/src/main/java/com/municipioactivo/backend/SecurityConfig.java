@@ -36,7 +36,7 @@ public class SecurityConfig {
             .formLogin(formLogin -> formLogin.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/*.html", "/Css/**", "/js/**", "/assets/**").permitAll()
+                .requestMatchers("/", "/*.html", "/seguimiento.html", "/Css/**", "/js/**", "/assets/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/registro").permitAll()
