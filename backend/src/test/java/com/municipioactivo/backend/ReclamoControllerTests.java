@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -83,6 +84,27 @@ class ReclamoControllerTests {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(reclamoService, never()).obtenerTodosLosReclamos();
         verify(reclamoService, never()).guardarReclamo(any(Reclamo.class));
+    }
+
+    @Test
+    void findsClaimByTrackingCode() {
+        Reclamo reclamo = new Reclamo("Bacheo", "Calle Belgrano 450", "", "Hay un bache que dificulta el paso.", "");
+        when(reclamoService.buscarPorCodigoSeguimiento("ABC123")).thenReturn(Optional.of(reclamo));
+
+        var response = controller.consultarPorCodigo(" ABC123 ");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(reclamo, response.getBody());
+        verify(reclamoService).buscarPorCodigoSeguimiento("ABC123");
+    }
+
+    @Test
+    void returnsNotFoundForUnknownTrackingCode() {
+        when(reclamoService.buscarPorCodigoSeguimiento("UNKNOWN")).thenReturn(Optional.empty());
+
+        var response = controller.consultarPorCodigo("UNKNOWN");
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test

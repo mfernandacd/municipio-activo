@@ -86,6 +86,17 @@ public class ReclamoController {
         return reclamoService.obtenerTodosLosReclamos();
     }
 
+    @GetMapping("/{codigoSeguimiento}")
+    public ResponseEntity<Reclamo> consultarPorCodigo(@PathVariable String codigoSeguimiento) {
+        if (codigoSeguimiento == null || codigoSeguimiento.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return reclamoService.buscarPorCodigoSeguimiento(codigoSeguimiento.trim())
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/estado/{estado}")
     // Devuelve los reclamos cuyo estado coincide con el parámetro recibido.
     public List<Reclamo> obtenerReclamosPorEstado(@PathVariable String estado) {
