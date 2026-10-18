@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Municipio Serranoble</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="Css/reclamos-municipal.css">
+    <meta name="municipio-api-base-url" content="">
+</head>
+<body class="dashboard-page d-flex flex-column min-vh-100">
+
+    <!-- Navbar Institucional -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm dashboard-navbar">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="index.html">
+                    <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2 rounded-circle" height="50">
+                    <span>Municipio Serranoble - Panel Admin</span>
+                </a>
+                <div class="d-flex align-items-center">
+                    <span id="adminUserGreeting" class="text-white me-3 small d-none d-md-inline" aria-live="polite"></span>
+                    <button type="button" class="btn btn-outline-light btn-sm" id="btnCerrarSesion">Cerrar sesión</button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal / Dashboard Privado -->
+    <main class="container dashboard-container my-5 flex-grow-1">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-8">
+                <p class="dashboard-eyebrow mb-2">Administración municipal</p>
+                <h1 class="h3 fw-bold text-primary m-0"><i class="fa-solid fa-shield-halved me-2" aria-hidden="true"></i>Gestión de reclamos</h1>
+                <p class="text-muted mb-0 mt-2">Consultá los reclamos recibidos y actualizá su estado de atención.</p>
+            </div>
+            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                <button id="btnRefrescar" class="btn btn-primary fw-bold">
+                    <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i>Actualizar lista
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla Organizada de Reclamos -->
+        <section class="card card-custom shadow-sm border-0" aria-label="Listado de reclamos">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0" id="tablaReclamos">
+                        <caption class="visually-hidden">Reclamos recibidos, su ubicación, estado y controles para actualizarlo</caption>
+                        <thead class="table-dark">
+                            <tr>
+                                <th scope="col" class="text-center" style="width: 10%;">ID</th>
+                                <th scope="col" style="width: 20%;">Categoría</th>
+                                <th scope="col" style="width: 35%;">Dirección / Ubicación</th>
+                                <th scope="col" class="text-center" style="width: 15%;">Estado Actual</th>
+                                <th scope="col" class="text-center" style="width: 20%;">Acciones (Gestionar)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyReclamos" aria-live="polite" aria-busy="true">
+                            <!-- Datos inyectados dinámicamente por JavaScript -->
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
+                                    Verificando credenciales y cargando reclamos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Municipio Serranoble - Panel de Gestión</p>
+        </div>
+    </footer>
+
+    <!-- Scripts de Bootstrap, SweetAlert2, accesibilidad y lógica del panel -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/accesibilidad.js"></script>
+    <script src="js/reclamo-vista.js"></script>
+</body>
+</html>
