@@ -19,6 +19,10 @@ body {
     flex-direction: column; /* Mantiene el footer pegado al fondo incluso con poco contenido */
 }
 
+body[data-auth-required] > :not(script) {
+    visibility: hidden;
+}
+
 main .container {
     max-width: 1200px;
 }

@@ -9,6 +9,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const apiBaseUrlInput = document.querySelector('meta[name="municipio-api-base-url"]');
 
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const mensajeAcceso = sessionStorage.getItem('mensajeAccesoLogin');
+
+    if (mensajeAcceso) {
+        sessionStorage.removeItem('mensajeAccesoLogin');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Acceso requerido',
+            text: mensajeAcceso,
+            confirmButtonColor: '#0d6efd'
+        });
+    }
 
     if (!loginForm || !usuarioInput || !passwordInput) return;
 

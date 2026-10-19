@@ -12,6 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.status === 401) {
                 localStorage.removeItem('usuarioMunicipio');
+                if (document.body.hasAttribute('data-auth-required')) {
+                    redirigirALogin('Se requiere registrar para poner un reclamo');
+                    return null;
+                }
                 protegerAdministracion(null);
                 return null;
             }
@@ -22,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const usuario = await response.json();
             usuario.privilegios = normalizarPrivilegios(usuario.privilegios);
             localStorage.setItem('usuarioMunicipio', JSON.stringify(usuario));
+            document.body.removeAttribute('data-auth-required');
             if (authLink && authContainer) {
                 mostrarSesionIniciada(usuario);
             }
@@ -30,8 +35,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('No se pudo comprobar la sesión del usuario.', error);
             protegerAdministracion(null);
+            if (document.body.hasAttribute('data-auth-required')) {
+                redirigirALogin('No se pudo verificar tu sesión. Iniciá sesión para poner un reclamo.');
+            }
             return null;
         }
+    }
+
+    function redirigirALogin(mensaje) {
+        sessionStorage.setItem('mensajeAccesoLogin', mensaje);
+        window.location.replace('login.html');
     }
 
     function protegerAdministracion(usuario) {

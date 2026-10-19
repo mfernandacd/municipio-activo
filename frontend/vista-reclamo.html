@@ -15,23 +15,9 @@
     <link rel="stylesheet" href="Css/reclamos-municipal.css">
     <meta name="municipio-api-base-url" content="">
 </head>
-<body class="dashboard-page d-flex flex-column min-vh-100">
+<body class="dashboard-page d-flex flex-column min-vh-100" data-admin-dashboard>
 
-    <!-- Navbar Institucional -->
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm dashboard-navbar">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="index.html">
-                    <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2 rounded-circle" height="50">
-                    <span>Municipio Serranoble - Panel Admin</span>
-                </a>
-                <div class="d-flex align-items-center">
-                    <span id="adminUserGreeting" class="text-white me-3 small d-none d-md-inline" aria-live="polite"></span>
-                    <button type="button" class="btn btn-outline-light btn-sm" id="btnCerrarSesion">Cerrar sesión</button>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <header data-site-header></header>
 
     <!-- Contenido Principal / Dashboard Privado -->
     <main class="container dashboard-container my-5 flex-grow-1">
@@ -78,16 +64,12 @@
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
-        <div class="container">
-            <p class="mb-0">&copy; 2026 Municipio Serranoble - Panel de Gestión</p>
-        </div>
-    </footer>
+    <footer class="bg-dark text-white py-4 mt-auto" data-site-footer></footer>
 
     <!-- Scripts de Bootstrap, SweetAlert2, accesibilidad y lógica del panel -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/componentes-comunes.js"></script>
     <script src="js/accesibilidad.js"></script>
     <script src="js/reclamo-vista.js"></script>
 </body>

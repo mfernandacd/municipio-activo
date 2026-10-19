@@ -10,19 +10,7 @@
     <link rel="stylesheet" href="Css/noticias.css">
 </head>
 <body data-admin-page>
-    <header>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center" href="index.html">
-                    <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
-                    <span>Municipio Serranoble</span>
-                </a>
-                <div class="navbar-nav ms-auto">
-                    <a class="nav-link" href="noticias.html">Volver a noticias</a>
-                </div>
-            </div>
-        </nav>
-    </header>
+    <header data-site-header></header>
 
     <main class="container my-4 noticias-page">
         <section class="noticias-intro mb-4">
@@ -85,9 +73,9 @@
         </section>
     </main>
 
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
-        <div class="container"><p class="mb-0">&copy; 2026 Municipio Serranoble - Todos los derechos reservados</p></div>
-    </footer>
+    <footer class="bg-dark text-white py-4 mt-auto" data-site-footer></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/componentes-comunes.js"></script>
     <script src="js/main.js"></script>
     <script src="js/noticias.js"></script>
     <script src="js/admin-noticias.js"></script>
