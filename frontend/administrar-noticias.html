@@ -21,7 +21,7 @@
 
         <section class="admin-noticias-panel mb-5" aria-labelledby="titulo-formulario-noticia">
             <h2 id="titulo-formulario-noticia" class="h3 fw-bold mb-4">Crear una noticia</h2>
-            <form id="form-noticia">
+            <form id="form-noticia" method="post" enctype="multipart/form-data">
                 <div class="row g-3">
                     <div class="col-12">
                         <label for="noticia-titulo" class="form-label">Título</label>
@@ -37,8 +37,14 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label for="noticia-imagen" class="form-label">Imagen (URL o ruta relativa)</label>
+                        <label for="noticia-imagen" class="form-label">Imagen existente (URL o ruta)</label>
                         <input id="noticia-imagen" name="image" class="form-control" placeholder="assets/logo/Logo.jpeg">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="noticia-imagen-archivo" class="form-label">Subir imagen desde el dispositivo</label>
+                        <input id="noticia-imagen-archivo" name="imageFile" class="form-control" type="file"
+                               accept="image/jpeg,image/png,image/gif,image/webp">
+                        <div class="form-text">Opcional, máximo 5 MB. Si seleccionás un archivo, reemplaza la URL o ruta.</div>
                     </div>
                     <div class="col-12">
                         <label for="noticia-resumen" class="form-label">Resumen</label>

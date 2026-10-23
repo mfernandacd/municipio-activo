@@ -32,23 +32,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function guardarNoticia(event) {
         event.preventDefault();
-        const datos = Object.fromEntries(new FormData(form));
+        const datos = new FormData(form);
+        const archivoImagen = datos.get('imageFile');
         const noticia = {
-            category: datos.category,
-            title: datos.title,
-            summary: datos.summary,
-            content: datos.content,
-            image: datos.image,
-            imageAlt: datos.imageAlt,
+            category: datos.get('category'),
+            title: datos.get('title'),
+            summary: datos.get('summary'),
+            content: datos.get('content'),
+            image: datos.get('image'),
+            imageAlt: datos.get('imageAlt'),
             featured: form.elements.featured.checked
         };
 
         try {
+            if (archivoImagen instanceof File && archivoImagen.size > 5 * 1024 * 1024) {
+                throw new Error('La imagen no puede superar los 5 MB.');
+            }
+
+            const cuerpo = new FormData();
+            cuerpo.append('noticia', new Blob([JSON.stringify(noticia)], { type: 'application/json' }));
+            if (archivoImagen instanceof File && archivoImagen.size > 0) {
+                cuerpo.append('imageFile', archivoImagen);
+            }
+
             await llamarApi(noticiaEditando
                 ? `/api/noticias/${encodeURIComponent(noticiaEditando)}`
                 : '/api/noticias', {
                 method: noticiaEditando ? 'PUT' : 'POST',
-                body: JSON.stringify(noticia)
+                body: cuerpo
             });
             mostrarEstado(noticiaEditando ? 'Noticia actualizada.' : 'Noticia publicada.');
             cancelarEdicion();
@@ -101,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
         form.elements.summary.value = noticia.summary;
         form.elements.content.value = noticia.content;
         form.elements.image.value = noticia.image || '';
+        form.elements.imageFile.value = '';
         form.elements.imageAlt.value = noticia.imageAlt || '';
         form.elements.featured.checked = noticia.featured;
         tituloFormulario.textContent = 'Modificar noticia';
@@ -133,13 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function llamarApi(endpoint, options = {}) {
+        const headers = {
+            Accept: 'application/json',
+            ...options.headers
+        };
+        if (options.body && !(options.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
+
         const response = await fetch(resolverApiUrl(endpoint), {
             ...options,
-            headers: {
-                Accept: 'application/json',
-                ...(options.body ? { 'Content-Type': 'application/json' } : {}),
-                ...options.headers
-            },
+            headers,
             credentials: 'include'
         });
 

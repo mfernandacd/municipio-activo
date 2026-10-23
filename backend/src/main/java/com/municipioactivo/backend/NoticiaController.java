@@ -1,5 +1,11 @@
 package com.municipioactivo.backend;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
@@ -9,17 +15,20 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/noticias")
@@ -43,37 +52,54 @@ public class NoticiaController {
         return NoticiaResponse.from(findEntity(slug));
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional
     public NoticiaResponse create(@Valid @RequestBody NoticiaRequest request) {
-        Noticia noticia = new Noticia();
-        noticia.setSlug(createSlug(request.title()));
-        apply(noticia, request);
-        if (request.featured()) {
-            clearFeatured();
-        } else if (repository.count() == 0) {
-            noticia.setFeatured(true);
-        }
-        return NoticiaResponse.from(repository.save(noticia));
+        return createNoticia(request, null);
     }
 
-    @PutMapping("/{slug}")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    @Transactional
+    public NoticiaResponse createWithImage(
+            @Valid @RequestPart("noticia") NoticiaRequest request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        return createNoticia(request, imageFile);
+    }
+
+    @PutMapping(value = "/{slug}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public NoticiaResponse update(@PathVariable String slug, @Valid @RequestBody NoticiaRequest request) {
+        return updateNoticia(slug, request, null);
+    }
+
+    @PutMapping(value = "/{slug}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Transactional
+    public NoticiaResponse updateWithImage(
+            @PathVariable String slug,
+            @Valid @RequestPart("noticia") NoticiaRequest request,
+            @RequestPart(value = "imageFile", required = false) MultipartFile imageFile) {
+        return updateNoticia(slug, request, imageFile);
+    }
+
+    private NoticiaResponse updateNoticia(String slug, NoticiaRequest request, MultipartFile imageFile) {
         Noticia noticia = findEntity(slug);
         boolean wasFeatured = noticia.isFeatured();
-        apply(noticia, request);
-        if (request.featured()) {
-            clearFeatured();
-            noticia.setFeatured(true);
-        } else if (wasFeatured) {
-            noticia.setFeatured(false);
-            if (repository.findAllByFeaturedTrue().isEmpty()) {
-                noticia.setFeatured(true);
+        Path uploadedFile = null;
+
+        try {
+            apply(noticia, request);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                uploadedFile = storeImage(imageFile);
+                noticia.setImage(toPublicImagePath(uploadedFile));
             }
+            updateFeaturedStatus(noticia, request.featured(), wasFeatured);
+            return NoticiaResponse.from(repository.save(noticia));
+        } catch (RuntimeException exception) {
+            deleteUploadedFile(uploadedFile, exception);
+            throw exception;
         }
-        return NoticiaResponse.from(repository.save(noticia));
     }
 
     @DeleteMapping("/{slug}")
@@ -97,6 +123,133 @@ public class NoticiaController {
 
     private void clearFeatured() {
         repository.findAllByFeaturedTrue().forEach(item -> item.setFeatured(false));
+    }
+
+    private NoticiaResponse createNoticia(NoticiaRequest request, MultipartFile imageFile) {
+        Path uploadedFile = null;
+        try {
+            Noticia noticia = new Noticia();
+            noticia.setSlug(createSlug(request.title()));
+            apply(noticia, request);
+            if (imageFile != null && !imageFile.isEmpty()) {
+                uploadedFile = storeImage(imageFile);
+                noticia.setImage(toPublicImagePath(uploadedFile));
+            }
+            if (request.featured()) {
+                clearFeatured();
+            } else if (repository.count() == 0) {
+                noticia.setFeatured(true);
+            }
+            return NoticiaResponse.from(repository.save(noticia));
+        } catch (RuntimeException exception) {
+            deleteUploadedFile(uploadedFile, exception);
+            throw exception;
+        }
+    }
+
+    private Path storeImage(MultipartFile imageFile) {
+        if (imageFile.getSize() > 5L * 1024 * 1024) {
+            throw new ResponseStatusException(HttpStatus.CONTENT_TOO_LARGE,
+                    "La imagen no puede superar los 5 MB.");
+        }
+
+        String extension = imageExtension(imageFile);
+        Path uploadDirectory = Paths.get("uploads").toAbsolutePath().normalize();
+        Path destination = uploadDirectory.resolve(UUID.randomUUID() + extension).normalize();
+        if (!destination.startsWith(uploadDirectory)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ruta de la imagen no es válida.");
+        }
+
+        try {
+            Files.createDirectories(uploadDirectory);
+            try (InputStream input = imageFile.getInputStream()) {
+                Files.copy(input, destination);
+            }
+            return destination;
+        } catch (IOException exception) {
+            deleteUploadedFile(destination, exception);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No se pudo guardar la imagen.", exception);
+        } catch (RuntimeException exception) {
+            deleteUploadedFile(destination, exception);
+            throw exception;
+        }
+    }
+
+    private String imageExtension(MultipartFile imageFile) {
+        String contentType = imageFile.getContentType();
+        String extension = contentType == null ? null : switch (contentType.toLowerCase(Locale.ROOT)) {
+            case "image/jpeg" -> ".jpg";
+            case "image/png" -> ".png";
+            case "image/gif" -> ".gif";
+            case "image/webp" -> ".webp";
+            default -> null;
+        };
+        if (extension == null || !hasValidImageSignature(imageFile, extension)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El archivo debe ser una imagen JPG, PNG, GIF o WebP válida.");
+        }
+        return extension;
+    }
+
+    private boolean hasValidImageSignature(MultipartFile imageFile, String extension) {
+        try (InputStream input = imageFile.getInputStream()) {
+            byte[] header = input.readNBytes(12);
+            return switch (extension) {
+                case ".jpg" -> startsWith(header, (byte) 0xff, (byte) 0xd8, (byte) 0xff);
+                case ".png" -> startsWith(header,
+                        (byte) 0x89, (byte) 0x50, (byte) 0x4e, (byte) 0x47,
+                        (byte) 0x0d, (byte) 0x0a, (byte) 0x1a, (byte) 0x0a);
+                case ".gif" -> asciiAt(header, 0, "GIF87a") || asciiAt(header, 0, "GIF89a");
+                case ".webp" -> asciiAt(header, 0, "RIFF") && asciiAt(header, 8, "WEBP");
+                default -> false;
+            };
+        } catch (IOException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No se pudo leer el archivo de imagen.", exception);
+        }
+    }
+
+    private boolean startsWith(byte[] value, byte... prefix) {
+        if (value.length < prefix.length) return false;
+        for (int index = 0; index < prefix.length; index++) {
+            if (value[index] != prefix[index]) return false;
+        }
+        return true;
+    }
+
+    private boolean asciiAt(byte[] value, int offset, String expected) {
+        byte[] bytes = expected.getBytes(StandardCharsets.US_ASCII);
+        if (value.length < offset + bytes.length) return false;
+        for (int index = 0; index < bytes.length; index++) {
+            if (value[offset + index] != bytes[index]) return false;
+        }
+        return true;
+    }
+
+    private void updateFeaturedStatus(Noticia noticia, boolean featured, boolean wasFeatured) {
+        if (featured) {
+            clearFeatured();
+            noticia.setFeatured(true);
+        } else if (wasFeatured) {
+            noticia.setFeatured(false);
+            if (repository.findAllByFeaturedTrue().isEmpty()) {
+                noticia.setFeatured(true);
+            }
+        }
+    }
+
+    private String toPublicImagePath(Path uploadedFile) {
+        return "/uploads/" + uploadedFile.getFileName();
+    }
+
+    private void deleteUploadedFile(Path uploadedFile, Exception exception) {
+        if (uploadedFile == null) return;
+        try {
+            Files.deleteIfExists(uploadedFile);
+        } catch (IOException cleanupException) {
+            exception.addSuppressed(cleanupException);
+        }
     }
 
     private void apply(Noticia noticia, NoticiaRequest request) {
