@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,13 +48,39 @@ public class AuthController {
         }
 
         return usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(authentication.getName())
-                .map(usuario -> ResponseEntity.ok(Map.of(
-                        "nombre", usuario.getNombre(),
-                        "email", usuario.getEmail(),
-                        "rol", usuario.getRol(),
-                        "privilegios", usuario.getPrivilegios() == null ? "" : usuario.getPrivilegios())))
+                .map(usuario -> {
+                    actualizarAutoridades(authentication, usuario);
+                    return ResponseEntity.ok(Map.of(
+                            "nombre", usuario.getNombre(),
+                            "email", usuario.getEmail(),
+                            "rol", usuario.getRol(),
+                            "privilegios", usuario.getPrivilegios() == null ? "" : usuario.getPrivilegios()));
+                })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("mensaje", "No hay una sesión iniciada")));
+    }
+
+    private void actualizarAutoridades(
+            Authentication authentication,
+            Usuario usuario) {
+        // Mantiene los permisos de la sesiÃ³n alineados con el rol actual que recibe el frontend.
+        String authority = "ROLE_" + usuario.getRol().toUpperCase(Locale.ROOT);
+        boolean tieneRolActual = authentication.getAuthorities().size() == 1
+                && authentication.getAuthorities().stream()
+                        .anyMatch(grantedAuthority -> authority.equals(grantedAuthority.getAuthority()));
+        if (tieneRolActual) return;
+
+        if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes requestAttributes)
+                || requestAttributes.getResponse() == null) return;
+
+        UsernamePasswordAuthenticationToken updatedAuthentication =
+                UsernamePasswordAuthenticationToken.authenticated(
+                        usuario.getEmail(), null, List.of(new SimpleGrantedAuthority(authority)));
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(updatedAuthentication);
+        SecurityContextHolder.setContext(context);
+        new HttpSessionSecurityContextRepository().saveContext(
+                context, requestAttributes.getRequest(), requestAttributes.getResponse());
     }
 
     @PostMapping("/logout")
