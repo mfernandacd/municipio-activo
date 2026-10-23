@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -20,6 +22,12 @@ public class SecurityConfig {
 
     @Value("${FRONTEND_ORIGINS:}")
     private String frontendOrigins;
+
+    private final UsuarioRepository usuarioRepository;
+
+    public SecurityConfig(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
 
     // Proporciona el codificador BCrypt usado para almacenar y validar contraseñas.
     @Bean
@@ -36,7 +44,9 @@ public class SecurityConfig {
             .formLogin(formLogin -> formLogin.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/*.html", "/seguimiento.html", "/Css/**", "/js/**", "/assets/**").permitAll()
+                .requestMatchers(
+                        "/", "/*.html", "/seguimiento.html", "/Css/**", "/js/**", "/assets/**", "/uploads/**")
+                    .permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/registro").permitAll()
@@ -44,9 +54,15 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/reclamos").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/noticias", "/api/noticias/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/noticias/**").hasRole("ADMINISTRATIVO")
-                .requestMatchers(HttpMethod.PUT, "/api/noticias/**").hasRole("ADMINISTRATIVO")
-                .requestMatchers(HttpMethod.DELETE, "/api/noticias/**").hasRole("ADMINISTRATIVO")
+                .requestMatchers(HttpMethod.POST, "/api/noticias", "/api/noticias/**")
+                    .access((authentication, context) -> new AuthorizationDecision(
+                            usuarioEsAdministrativo(authentication.get())))
+                .requestMatchers(HttpMethod.PUT, "/api/noticias/**")
+                    .access((authentication, context) -> new AuthorizationDecision(
+                            usuarioEsAdministrativo(authentication.get())))
+                .requestMatchers(HttpMethod.DELETE, "/api/noticias/**")
+                    .access((authentication, context) -> new AuthorizationDecision(
+                            usuarioEsAdministrativo(authentication.get())))
                 .requestMatchers(HttpMethod.GET, "/api/reclamos/seguimiento/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reclamos", "/api/reclamos/**")
                     .hasRole("ADMINISTRATIVO")
@@ -54,6 +70,18 @@ public class SecurityConfig {
                 .anyRequest().denyAll());
 
         return http.build();
+    }
+
+    // Check the current database role so an old session authority cannot block a valid administrator.
+    private boolean usuarioEsAdministrativo(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            return false;
+        }
+
+        return usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(authentication.getName())
+                .map(usuario -> "administrativo".equalsIgnoreCase(usuario.getRol()))
+                .orElse(false);
     }
 
     @Bean

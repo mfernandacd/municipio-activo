@@ -140,6 +140,21 @@ class BackendApplicationTests {
 		HttpClient administrativeClient = authenticatedClient("administrativo");
 		assertEquals(201,
 				administrativeClient.send(createNews, HttpResponse.BodyHandlers.ofString()).statusCode());
+
+		String boundary = "MunicipioBoundary" + UUID.randomUUID();
+		String multipartNews = "{\"category\":\"Actividades\",\"title\":\"Noticia multipart\","
+				+ "\"summary\":\"Resumen de prueba\",\"content\":\"Contenido de prueba\","
+				+ "\"image\":\"assets/logo/Logo.jpeg\",\"imageAlt\":\"\",\"featured\":false}";
+		String multipartBody = "--" + boundary + "\r\n"
+				+ "Content-Disposition: form-data; name=\"noticia\"; filename=\"noticia.json\"\r\n"
+				+ "Content-Type: application/json\r\n\r\n"
+				+ multipartNews + "\r\n--" + boundary + "--\r\n";
+		var multipartCreateNews = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/noticias"))
+				.header("Content-Type", "multipart/form-data; boundary=" + boundary)
+				.POST(HttpRequest.BodyPublishers.ofString(multipartBody))
+				.build();
+		assertEquals(201,
+				administrativeClient.send(multipartCreateNews, HttpResponse.BodyHandlers.ofString()).statusCode());
 	}
 
 	@Test

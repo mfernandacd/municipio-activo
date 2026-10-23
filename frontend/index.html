@@ -14,11 +14,9 @@
     <header data-site-header></header>
 
     <!-- Contenido principal de la página: aquí se agrupan las secciones informativas del sitio -->
-    
+    <main class="container my-4">
 
-<main class="container my-4">
     <div class="home-zone zona-principal" id="principal">
-        
         <!-- 1. SECCIÓN DE BIENVENIDA / HERO -->
         <section class="hero-bienvenidos mb-5">
             <div class="hero-container">
@@ -40,141 +38,133 @@
 
                 <!-- Tarjeta con la foto del Municipio (o escudo) -->
                 <div class="hero-image-card">
-                    <img src="muni.jpg" alt="Municipio" class="municipio-img">
+                    <img src="assets/imagenes/muni.jpg" alt="Municipio" class="municipio-img">
                 </div>
             </div>
         </section>
-
-        <!-- 2. SECCIÓN NOTICIAS COMPLETA -->
-        <section class="mb-5" id="noticias">
-            <h2 class="text-center fw-bold text-uppercase mb-4 title-section">NOTICIAS</h2>
-            
-            <!-- Noticia Destacada Principal -->
-            <div class="row g-4 mb-4">
-                <div class="col-12">
-                    <div class="card card-principal bienvenida-card h-100 shadow-sm overflow-hidden">
-                        <img id="noticia-destacada-imagen" src="principal.png" class="card-img-top p-2" alt="Noticia Principal">
-                        <div class="card-body">
-                            <p id="noticia-destacada-titulo" class="card-text fw-bold fs-4">La Municipalidad despliega una agenda semanal con...</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 text-end pb-3">
-                            <a id="noticia-destacada-enlace" href="noticias.html" class="btn btn-success btn-sm px-3">Ampliar</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Grilla de las 4 Noticias Secundarias (de la 2da imagen) -->
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3 mb-4">
-                
-                <!-- Noticia 1 -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="gatitos.jpg" class="card-img-top bg-dark p-2" alt="Gatos en adopción">
-                        <div class="card-body p-3">
-                            <span class="text-uppercase fw-bold text-muted small d-block mb-1">COMUNIDAD</span>
-                            <h6 class="card-title fw-bold">Gatos en adopción: nueva jornada de tenencia responsable</h6>
-                            <p class="card-text text-muted small">La jornada promueve la adopción responsable y el cuidado de los animales.</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                            <a href="noticias.html" class="btn btn-outline-primary btn-sm w-100">Leer noticia</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Noticia 2 -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="viviendas.jpg" class="card-img-top bg-dark p-2" alt="Convenio viviendas">
-                        <div class="card-body p-3">
-                            <span class="text-uppercase fw-bold text-muted small d-block mb-1">GESTIÓN</span>
-                            <h6 class="card-title fw-bold">La Municipalidad firmó un convenio para construir 100 viviendas</h6>
-                            <p class="card-text text-muted small">El acuerdo impulsa un nuevo proyecto habitacional para vecinos de Serranoble.</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                            <a href="noticias.html" class="btn btn-outline-primary btn-sm w-100">Leer noticia</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Noticia 3 -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="agenda cultural.jpg" class="card-img-top bg-dark p-2" alt="Agenda cultural">
-                        <div class="card-body p-3">
-                            <span class="text-uppercase fw-bold text-muted small d-block mb-1">ACTIVIDADES</span>
-                            <h6 class="card-title fw-bold">La Municipalidad presenta la agenda de actividades para esta semana</h6>
-                            <p class="card-text text-muted small">Conocé las propuestas y actividades abiertas para disfrutar en la comunidad.</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                            <a href="noticias.html" class="btn btn-outline-primary btn-sm w-100">Leer noticia</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Noticia 4 -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="noticiabarrios2.jpg" class="card-img-top bg-dark p-2" alt="La Muni Más Cerca">
-                        <div class="card-body p-3">
-                            <span class="text-uppercase fw-bold text-muted small d-block mb-1">LA MUNI MÁS CERCA</span>
-                            <h6 class="card-title fw-bold">La Muni Más Cerca llegó al barrio Los Fresnos en su edición 111</h6>
-                            <p class="card-text text-muted small">El operativo acercó servicios municipales y atención a las familias del barrio.</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 p-3 pt-0">
-                            <a href="noticias.html" class="btn btn-outline-primary btn-sm w-100">Leer noticia</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Botón Ver más noticias -->
-            <div class="text-center mt-3">
-                <a href="noticias.html" class="btn btn-outline-primary fw-bold px-4">Ver más noticias</a>
-            </div>
-        </section>
-
-        <!-- 3. SECCIÓN TRÁMITES Y SERVICIOS -->
-        <section class="mb-5" id="tramites-servicios">
-            <h2 class="text-center fw-bold text-uppercase mb-4 title-section">TRÁMITES Y SERVICIOS</h2>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-                
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 text-center p-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Nuevo Reclamo</h5>
-                            <p class="card-text text-muted small">Iniciá una solicitud o reporte sobre alumbrado, bacheo o limpieza.</p>
-                            <a href="reclamos-municipal.html" class="btn btn-primary btn-sm">Ingresar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 text-center p-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Seguimiento de Reclamo</h5>
-                            <p class="card-text text-muted small">Consultá el estado actual del reclamo ingresado previamente.</p>
-                            <a href="seguimiento.html" class="btn btn-primary btn-sm">Consultar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0 text-center p-3">
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">Consultas Generales</h5>
-                            <p class="card-text text-muted small">Información sobre licencias, tasas municipales y servicios públicos.</p>
-                            <a href="interfaz_de_consultas.html" class="btn btn-primary btn-sm">Ver Servicios</a>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
     </div>
+
+    <section class="home-zone zona-noticias mb-5" id="noticias" aria-labelledby="titulo-noticias">
+        <h2 id="titulo-noticias" class="text-center fw-bold text-uppercase mb-4 title-section">Noticias</h2>
+
+        <article class="noticia-destacada-inicio mb-4">
+            <img id="noticia-destacada-imagen" src="assets/imagenes/principal.png" alt="Noticia destacada">
+            <div class="noticia-destacada-contenido">
+                <p class="noticias-etiqueta mb-2">Destacada</p>
+                <h3 id="noticia-destacada-titulo">La Municipalidad despliega una agenda semanal con capacitaciones, servicios en terreno y nuevas acciones de fortalecimiento barrial para toda la comunidad.</h3>
+                <a id="noticia-destacada-enlace" href="noticias.html" class="btn btn-success">Ampliar noticia</a>
+            </div>
+        </article>
+
+        <div id="noticias-secundarias" class="noticias-carrusel" tabindex="0" role="region" aria-label="Noticias recientes" aria-live="polite"></div>
+
+        <div class="text-center mt-4">
+            <a href="noticias.html" class="btn btn-outline-primary fw-bold px-4">Ver todas las noticias</a>
+        </div>
+    </section>
+
+    <!-- Sección 3: trámites y servicios disponibles para ciudadanos, con acceso rápido a reclamos, consultas y seguimiento -->
+    <section id="tramites" class="my-5 py-4 bg-light rounded text-center">
+        <h2 class="fw-bold text-uppercase mb-4 title-section">Trámites y Servicios</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center px-3">
+            <!-- Opción 1: Nuevo Reclamo -->
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 py-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Nuevo Reclamo</h5>
+                        <p class="card-text small text-muted">Inicia una solicitud o reporte sobre alumbrado, bacheo o limpieza.</p>
+                        <a href="reclamos-municipal.html" class="btn btn-primary mt-2">Ingresar</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Opción 2: Seguimiento de Reclamo -->
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 py-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Seguimiento de Reclamo</h5>
+                        <p class="card-text small text-muted">Consulta el estado actual del reclamo ingresado previamente.</p>
+                        <a href="seguimiento.html" class="btn btn-primary mt-2">Consultar</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Opción 3: Consultas y Servicios -->
+            <div class="col">
+                <div class="card h-100 shadow-sm border-0 py-3">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">Consultas Generales</h5>
+                        <p class="card-text small text-muted">Información sobre licencias, tasas municipales y servicios públicos.</p>
+                        <a href="servicios.html" class="btn btn-primary mt-2">Ver Servicios</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </main>
+
+<!-- Panel de accesibilidad: permite ajustar tamaño de fuente, contraste, lectura y otros ajustes para mejorar la experiencia del usuario -->
+<div id="panel-accesibilidad" class="panel-accesibilidad d-none" aria-labelledby="titulo-accesibilidad">
+    <div class="panel-accesibilidad-topbar">
+        <div class="panel-idioma-wrapper">
+            <button type="button" id="btn-idioma" class="panel-idioma" aria-label="Seleccionar idioma" aria-expanded="false" aria-controls="lista-idiomas">🇪🇸 <span>Español</span>⌄</button>
+            <div id="lista-idiomas" class="panel-lista-idiomas" hidden>
+                <button type="button" aria-current="true">🇪🇸 Español (actual)</button>
+            </div>
+        </div>
+        <button type="button" id="btn-cerrar-accesibilidad" class="panel-cerrar" aria-label="Cerrar">&times;</button>
+    </div>
+    <div class="panel-accesibilidad-header">
+        <div class="panel-icono" aria-hidden="true">&#9733;</div>
+        <h2 id="titulo-accesibilidad">Ajustes de Accesibilidad</h2>
+        <p>Desarrollado para Municipio Activo · Ocultar barra de herramientas</p>
+    </div>
+    <div class="panel-accesibilidad-body">
+        <section class="accesibilidad-seccion" aria-labelledby="contenido-accesibilidad">
+            <h3 id="contenido-accesibilidad">Módulos de contenido</h3>
+            <div class="control-tamano-fuente">
+                <span>Tamaño de fuente</span>
+                <div class="control-tamano-botones">
+                    <button type="button" class="control-circular" data-action="increase-font" aria-label="Aumentar tamaño de fuente">+</button>
+                    <button type="button" class="control-predeterminado" data-action="reset-font">Predeterminado</button>
+                    <button type="button" class="control-circular" data-action="decrease-font" aria-label="Disminuir tamaño de fuente">−</button>
+                </div>
+            </div>
+            <div class="accesibilidad-grid">
+                <button type="button" class="accesibilidad-opcion" data-action="readable-font"><span class="opcion-icon">Aa</span><span>Fuente legible</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="line-height"><span class="opcion-icon">↕</span><span>Altura de línea</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="cursor"><span class="opcion-icon">⌁</span><span>Cursor grande</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="letter-spacing"><span class="opcion-icon">↔</span><span>Espaciado de letras</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="align-center"><span class="opcion-icon">≡</span><span>Alinear al centro</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="bold"><span class="opcion-icon">B</span><span>Grosor de fuente</span></button>
+            </div>
+        </section>
+        <section class="accesibilidad-seccion" aria-labelledby="color-accesibilidad">
+            <h3 id="color-accesibilidad">Módulos de color</h3>
+            <div class="accesibilidad-grid accesibilidad-grid-three">
+                <button type="button" class="accesibilidad-opcion" data-action="light-contrast"><span class="opcion-icon">☼</span><span>Contraste claro</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="high-contrast"><span class="opcion-icon">◐</span><span>Alto contraste</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="monochrome"><span class="opcion-icon">◑</span><span>Monocromo</span></button>
+            </div>
+        </section>
+        <section class="accesibilidad-seccion" aria-labelledby="orientacion-accesibilidad">
+            <h3 id="orientacion-accesibilidad">Módulos de orientación</h3>
+            <div class="accesibilidad-grid accesibilidad-grid-three">
+                <button type="button" class="accesibilidad-opcion" data-action="reading-line"><span class="opcion-icon">▤</span><span>Línea de lectura</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="reading-mask"><span class="opcion-icon">▰</span><span>Máscara de lectura</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="hide-images"><span class="opcion-icon">◩</span><span>Ocultar imágenes</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="highlight-content"><span class="opcion-icon">⛶</span><span>Resaltar contenido</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="stop-animations"><span class="opcion-icon">⊘</span><span>Detener animaciones</span></button>
+                <button type="button" class="accesibilidad-opcion" data-action="underline-links"><span class="opcion-icon">↗</span><span>Resaltar enlaces</span></button>
+            </div>
+        </section>
+        <button type="button" id="btn-restablecer-accesibilidad" class="btn-restablecer-accesibilidad">Restablecer configuraciones</button>
+    </div>
+</div>
+
+<!-- Botón flotante para abrir y cerrar el panel de accesibilidad desde cualquier parte de la página -->
+<button type="button" id="btn-accesibilidad" class="btn-accesibilidad" aria-label="Ajustes de accesibilidad" aria-expanded="false" aria-controls="panel-accesibilidad">
+    <img src="https://www.munichile.cl/wp-content/plugins/accessibility-onetap/assets/images/admin/Original_Logo_Icon.svg" alt="Icono de accesibilidad">
+</button>
 
     <footer class="bg-dark text-white py-4 mt-auto" data-site-footer></footer>
 
