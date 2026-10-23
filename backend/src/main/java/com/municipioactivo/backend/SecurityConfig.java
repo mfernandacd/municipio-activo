@@ -57,26 +57,32 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/noticias", "/api/noticias/**")
                     .access((authentication, context) -> new AuthorizationDecision(
                             usuarioEsAdministrativo(authentication.get())))
-                .requestMatchers(HttpMethod.PUT, "/api/noticias/**")
+                .requestMatchers(HttpMethod.PUT, "/api/noticias", "/api/noticias/**")
                     .access((authentication, context) -> new AuthorizationDecision(
                             usuarioEsAdministrativo(authentication.get())))
-                .requestMatchers(HttpMethod.DELETE, "/api/noticias/**")
+                .requestMatchers(HttpMethod.DELETE, "/api/noticias", "/api/noticias/**")
                     .access((authentication, context) -> new AuthorizationDecision(
                             usuarioEsAdministrativo(authentication.get())))
                 .requestMatchers(HttpMethod.GET, "/api/reclamos/seguimiento/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reclamos", "/api/reclamos/**")
                     .hasRole("ADMINISTRATIVO")
-                .requestMatchers(HttpMethod.PUT, "/api/reclamos/**").hasRole("ADMINISTRATIVO")
+                .requestMatchers(HttpMethod.PUT, "/api/reclamos", "/api/reclamos/**").hasRole("ADMINISTRATIVO")
                 .anyRequest().denyAll());
 
         return http.build();
     }
 
-    // Check the current database role so an old session authority cannot block a valid administrator.
+    // Valida el rol tanto en authorities de sesión en memoria como en base de datos.
     private boolean usuarioEsAdministrativo(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()
                 || "anonymousUser".equals(authentication.getPrincipal())) {
             return false;
+        }
+
+        boolean tieneRolEnSesion = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMINISTRATIVO".equalsIgnoreCase(a.getAuthority()));
+        if (tieneRolEnSesion) {
+            return true;
         }
 
         return usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(authentication.getName())
@@ -89,15 +95,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         List<String> allowedOriginPatterns = new ArrayList<>(
-            List.of("http://localhost:*", "http://127.0.0.1:*"));
+            List.of("http://localhost:*", "http://127.0.0.1:*", "https://*.onrender.com", "https://*.render.com"));
         for (String origin : frontendOrigins.split(",")) {
             if (!origin.isBlank()) {
                 allowedOriginPatterns.add(origin.trim());
             }
         }
         configuration.setAllowedOriginPatterns(allowedOriginPatterns);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "Accept"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "Authorization", "X-Requested-With"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
