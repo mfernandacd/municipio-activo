@@ -13,7 +13,7 @@
 body {
     font-family: var(--font-family-base);
     color: var(--color-text-dark);
-    background: linear-gradient(180deg, #f8fbff 0%, #edf3f8 100%);
+    background: radial-gradient(circle, #F8FAFC 0%, #0F172A 100%);
     min-height: 100vh;
     display: flex; /* Establece la estructura vertical de la página */
     flex-direction: column; /* Mantiene el footer pegado al fondo incluso con poco contenido */
@@ -48,18 +48,29 @@ main .container {
    ========================================================== */
 header .navbar {
     background-color: var(--color-primary) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para separar la cabecera del contenido */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    
+    /* Usamos la misma variable y grosor que el footer: */
+    border-bottom: 3px solid var(--color-accent);
 }
 
 .navbar-brand span {
     font-weight: 700;
-    font-size: 1.25rem;
+    font-size: 1.5rem; 
     letter-spacing: 0.5px;
 }
 
 .nav-link {
     font-weight: 500;
+    font-size: 1.1rem;
+    padding: 0.5rem 1.2rem !important;
     transition: color 0.2s ease-in-out;
+    border-right: none;
+}
+
+/* Ponemos la línea vertical solo entre los primeros elementos, excluyendo los últimos dos */
+.navbar-nav .nav-item:not(:last-child):not(:nth-last-child(2)) .nav-link {
+    border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
 .nav-link:hover {
@@ -78,6 +89,7 @@ main {
     border-left: 5px solid var(--color-accent);
     padding: 3rem 1.5rem;
 }
+
 
 .hero h1 {
     color: var(--color-primary);
@@ -120,15 +132,22 @@ footer p {
 
 /* Tarjetas principales para las noticias destacadas en la portada */
 .card-principal {
-    border: 2px solid #1f5fbf;
+    border: none; /* Cambias este valor por el azul de las secundarias */
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 18px 35px rgba(13, 31, 45, 0.10);
 }
 
+/* Estilo para la imagen de la tarjeta principal */
 .card-principal img {
     height: 420px;
     object-fit: cover;
+    width: 100%;
+    
+    /* Agregamos el marco negro/gris que tienen las noticias pequeñas */
+    background-color: #0b1728;            /* Fondo oscuro por si la imagen no cubre todo */
+    border: 2px solid #1e293b;            /* Borde gris/oscuro alrededor de la imagen */
+    border-bottom: 2px solid #1e293b;     /* O separador con el texto */
 }
 
 .card-principal .card-body {
@@ -573,4 +592,147 @@ body.alto-contraste section {
     .panel-accesibilidad-body {
         padding: 10px;
     }
+}
+
+/* Seccion Hero / Bienvenidos */
+.hero-bienvenidos {
+    background-color: #F3F4F6;
+    padding: 60px 50px;
+    border-radius: 28px;
+    border: 1px solid #e2e8f0;
+    
+    /* Expandimos el contenedor hacia los lados según marcaste en las flechas */
+    max-width: 1350px;  /* Aumentamos de 1100px a 1350px para estirarlo a lo ancho */
+    width: 100%;        /* Hace que ocupe todo el ancho disponible hasta ese límite */
+    margin: 0 auto 4rem auto; 
+    min-height: 85vh;   
+    
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+
+.hero-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    width: 100%;
+}
+
+.hero-content {
+    flex: 0 0 45%;
+    max-width: 45%;
+}
+
+.badge-bienvenidos {
+    display: inline-block;
+    background-color: #e2e8f0;
+    color: #1e3a8a;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.hero-title {
+    font-size: clamp(2.8rem, 4.2vw, 3.8rem); /* Letras más grandes */
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    text-transform: none;
+}
+
+.hero-title .text-highlight {
+    color: #1d4ed8;
+}
+
+.hero-description {
+    font-size: 1rem;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    max-width: 480px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-primary {
+    background-color: #1d4ed8;
+    color: #ffffff !important;
+    border: 1px solid #1d4ed8;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: #1e40af;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    color: #1d4ed8 !important;
+    border: 1px solid #1d4ed8;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background-color: #f1f5f9;
+}
+
+.hero-image-card {
+    flex: 0 0 54%; /* Un poquito más de ancho para la tarjeta */
+    max-width: 54%;
+    background: #0f2537;
+    padding: 12px;
+    border-radius: 24px;
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.12);
+    border: 1px solid #cbd5e1;
+    box-sizing: border-box;
+}
+
+
+.municipio-img {
+    width: 100%;
+    height: 440px; /* Aquí recupera el alto rectangular que querías */
+    object-fit: cover;
+    border-radius: 16px;
+    display: block;
+}
+@media (max-width: 992px) {
+    .hero-container {
+        flex-direction: column;
+    }
+    .hero-content, 
+    .hero-image-card {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+
+/* Altura uniforme solo para las 4 imágenes secundarias de abajo */
+#noticias .row-cols-md-4 .card-img-top {
+    height: 180px !important;
+    object-fit: cover !important;
+}
+
+/* Restablecemos la imagen principal destacada a su tamaño normal */
+#noticia-destacada-imagen {
+    height: auto !important;
+    max-height: 400px;
+    object-fit: contain !important;
 }
