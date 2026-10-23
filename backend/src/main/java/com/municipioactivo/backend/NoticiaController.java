@@ -25,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequestMapping("/api/noticias")
 public class NoticiaController {
 
+    private static final String DEFAULT_IMAGE_PATH = "assets/logo/Logo.jpeg";
+
     private final NoticiaRepository repository;
 
     public NoticiaController(NoticiaRepository repository) {
@@ -102,11 +104,24 @@ public class NoticiaController {
         noticia.setTitle(request.title().trim());
         noticia.setSummary(request.summary().trim());
         noticia.setContent(request.content().trim());
-        noticia.setImage(request.image() == null || request.image().isBlank()
-                ? "assets/imagenes/Logo.jpeg" : request.image().trim());
+        noticia.setImage(normalizeImagePath(request.image()));
         noticia.setImageAlt(request.imageAlt() == null || request.imageAlt().isBlank()
                 ? request.title().trim() : request.imageAlt().trim());
         noticia.setFeatured(request.featured());
+    }
+
+    private static String normalizeImagePath(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return DEFAULT_IMAGE_PATH;
+        }
+
+        String trimmedPath = imagePath.trim();
+        String comparablePath = trimmedPath.replace('\\', '/');
+        if ("assets/imagenes/Logo.jpeg".equalsIgnoreCase(comparablePath)
+                || "assets/Logo/Logo.jpeg".equalsIgnoreCase(comparablePath)) {
+            return DEFAULT_IMAGE_PATH;
+        }
+        return trimmedPath;
     }
 
     private String createSlug(String title) {
@@ -144,7 +159,8 @@ public class NoticiaController {
             boolean featured) {
         static NoticiaResponse from(Noticia noticia) {
             return new NoticiaResponse(noticia.getSlug(), noticia.getCategory(), noticia.getTitle(),
-                    noticia.getSummary(), noticia.getContent(), noticia.getImage(), noticia.getImageAlt(),
+                    noticia.getSummary(), noticia.getContent(), normalizeImagePath(noticia.getImage()),
+                    noticia.getImageAlt(),
                     noticia.isFeatured());
         }
     }

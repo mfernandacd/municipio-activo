@@ -8,7 +8,7 @@
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
                 <div class="container">
                     <a class="navbar-brand d-flex align-items-center" href="index.html">
-                        <img src="assets/imagenes/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
+                        <img src="assets/logo/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
                         <span>Municipio Serranoble</span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

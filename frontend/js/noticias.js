@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const titulo = document.getElementById('noticia-destacada-titulo');
         const enlace = document.getElementById('noticia-destacada-enlace');
         if (imagen) {
-            imagen.src = noticia.image || 'assets/imagenes/Logo.jpeg';
+            imagen.src = noticia.image || 'assets/logo/Logo.jpeg';
             imagen.alt = noticia.imageAlt || noticia.title;
         }
         if (titulo) titulo.textContent = noticia.title;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const imagen = document.createElement('img');
         imagen.className = 'card-img-top';
-        imagen.src = noticia.image || 'assets/imagenes/Logo.jpeg';
+        imagen.src = noticia.image || 'assets/logo/Logo.jpeg';
         imagen.alt = noticia.imageAlt || noticia.title;
 
         const cuerpo = document.createElement('div');
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const articulo = document.createElement('article');
         const imagen = document.createElement('img');
         imagen.className = 'img-fluid rounded mb-4';
-        imagen.src = noticia.image || 'assets/imagenes/Logo.jpeg';
+        imagen.src = noticia.image || 'assets/logo/Logo.jpeg';
         imagen.alt = noticia.imageAlt || noticia.title;
 
         const categoria = document.createElement('p');

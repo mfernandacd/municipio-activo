@@ -34,7 +34,7 @@ class NoticiaControllerTest {
         assertTrue(result.featured());
         assertTrue(result.id().startsWith("agenda-municipal-"));
         assertEquals("Agenda municipal", result.title());
-        assertEquals("assets/imagenes/Logo.jpeg", result.image());
+        assertEquals("assets/logo/Logo.jpeg", result.image());
     }
 
     @Test
