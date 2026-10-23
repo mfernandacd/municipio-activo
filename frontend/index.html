@@ -17,33 +17,51 @@
     <main class="container my-4">
 
     <div class="home-zone zona-principal" id="principal">
-        <section class="mb-5" aria-labelledby="titulo-bienvenida">
-            <h1 id="titulo-bienvenida" class="text-center fw-bold text-uppercase mb-4 title-section">Bienvenidos</h1>
-            <div class="row g-4">
-                <div class="col-12">
-                    <div class="card card-principal bienvenida-card h-100 shadow-sm overflow-hidden">
-                        <img id="noticia-destacada-imagen" src="assets/logo/Logo.jpeg" class="card-img-top p-2" alt="Emblema del Municipio Serranoble">
-                        <div class="card-body">
-                            <p id="noticia-destacada-titulo" class="card-text fw-bold fs-4">La Municipalidad despliega una agenda semanal con capacitaciones, servicios en terreno y nuevas acciones de fortalecimiento barrial para toda la comunidad.</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-0 text-end pb-3">
-                            <a id="noticia-destacada-enlace" href="noticias.html" class="btn btn-success btn-sm px-3">Ampliar</a>
-                        </div>
+        <!-- 1. SECCIÓN DE BIENVENIDA / HERO -->
+        <section class="hero-bienvenidos mb-5">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <span class="badge-bienvenidos">Bienvenidos</span>
+                    <h1 class="hero-title">
+                        Construyamos<br>
+                        juntos la ciudad<br>
+                        <span class="text-highlight">que queremos.</span>
+                    </h1>
+                    <p class="hero-description">
+                        Accedé a información del municipio y realizá tu reclamo de manera rápida y simple.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="servicios.html" class="btn btn-primary">Conocer servicios</a>
+                        <a href="reclamos-municipal.html" class="btn btn-secondary">Ingresar al portal</a>
                     </div>
+                </div>
+
+                <!-- Tarjeta con la foto del Municipio (o escudo) -->
+                <div class="hero-image-card">
+                    <img src="assets/imagenes/muni.jpg" alt="Municipio" class="municipio-img">
                 </div>
             </div>
         </section>
     </div>
 
-    <div class="home-zone zona-noticias" id="noticias">
-        <section class="mb-5" aria-labelledby="titulo-noticias">
-            <h2 id="titulo-noticias" class="text-center fw-bold text-uppercase mb-4 title-section">Noticias</h2>
-            <div id="noticias-secundarias" class="carousel-noticias d-flex gap-3 overflow-x-auto pb-3" aria-live="polite"></div>
-            <div class="text-center mt-4">
-                <a href="noticias.html" class="btn btn-outline-primary btn-lg fw-bold px-4">Ver más noticias</a>
+    <section class="home-zone zona-noticias mb-5" id="noticias" aria-labelledby="titulo-noticias">
+        <h2 id="titulo-noticias" class="text-center fw-bold text-uppercase mb-4 title-section">Noticias</h2>
+
+        <article class="noticia-destacada-inicio mb-4">
+            <img id="noticia-destacada-imagen" src="assets/imagenes/principal.png" alt="Noticia destacada">
+            <div class="noticia-destacada-contenido">
+                <p class="noticias-etiqueta mb-2">Destacada</p>
+                <h3 id="noticia-destacada-titulo">La Municipalidad despliega una agenda semanal con capacitaciones, servicios en terreno y nuevas acciones de fortalecimiento barrial para toda la comunidad.</h3>
+                <a id="noticia-destacada-enlace" href="noticias.html" class="btn btn-success">Ampliar noticia</a>
             </div>
-        </section>
-    </div>
+        </article>
+
+        <div id="noticias-secundarias" class="noticias-carrusel" tabindex="0" role="region" aria-label="Noticias recientes" aria-live="polite"></div>
+
+        <div class="text-center mt-4">
+            <a href="noticias.html" class="btn btn-outline-primary fw-bold px-4">Ver todas las noticias</a>
+        </div>
+    </section>
 
     <!-- Sección 3: trámites y servicios disponibles para ciudadanos, con acceso rápido a reclamos, consultas y seguimiento -->
     <section id="tramites" class="my-5 py-4 bg-light rounded text-center">

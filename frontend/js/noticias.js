@@ -45,9 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const secundarias = document.getElementById('noticias-secundarias');
         if (secundarias) {
             const destacada = noticias.find((noticia) => noticia.featured) || noticias[0];
-            secundarias.replaceChildren(...noticias
-                .filter((noticia) => noticia !== destacada)
-                .map(crearTarjetaNoticia));
+            const noticiasSecundarias = noticias.filter((noticia) => noticia !== destacada);
+            secundarias.replaceChildren(...noticiasSecundarias.map(crearTarjetaNoticia));
         }
     }
 
@@ -56,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         columna.className = 'col';
 
         const tarjeta = document.createElement('div');
-        tarjeta.className = 'card h-100 shadow-sm';
+        tarjeta.className = 'card h-100 shadow-sm noticia-card';
 
         const imagen = document.createElement('img');
         imagen.className = 'card-img-top';
@@ -84,8 +83,12 @@ document.addEventListener('DOMContentLoaded', () => {
         enlace.textContent = 'Leer noticia';
         enlace.setAttribute('aria-label', `Leer noticia: ${noticia.title}`);
 
-        cuerpo.append(categoria, titulo, resumen, enlace);
-        tarjeta.append(imagen, cuerpo);
+        const pie = document.createElement('div');
+        pie.className = 'card-footer bg-transparent border-0';
+        pie.append(enlace);
+
+        cuerpo.append(categoria, titulo, resumen);
+        tarjeta.append(imagen, cuerpo, pie);
         columna.append(tarjeta);
         return columna;
     }
