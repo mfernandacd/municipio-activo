@@ -1,0 +1,9 @@
+# Runtime uploads and secrets
+/uploads/
+/backend/uploads/
+.env
+.env.*
+!.env.example
+
+# Build artifacts
+/backend/target/

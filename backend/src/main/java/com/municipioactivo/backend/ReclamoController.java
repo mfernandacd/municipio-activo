@@ -1,16 +1,17 @@
 package com.municipioactivo.backend;
 
-import java.util.List;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
@@ -42,19 +43,19 @@ public class ReclamoController {
     // Guarda un reclamo enviado como JSON directo desde el frontend web.
     public ResponseEntity<Reclamo> crearReclamoJson(
             @Valid @RequestBody ReclamoJsonRequest request) {
+        if (request == null) return ResponseEntity.badRequest().build();
+
         String direccion = request.direccion();
         if (direccion == null || direccion.isBlank()) {
             direccion = "Ubicación informada en descripción";
         }
         String googleMaps = request.googleMapsUrl() != null ? request.googleMapsUrl() : "";
-        String imagenPath = request.imagenPath() != null ? request.imagenPath() : "";
-
         Reclamo reclamo = new Reclamo(
                 request.categoria(),
                 direccion,
                 googleMaps,
                 request.descripcion(),
-                imagenPath);
+                null);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(reclamoService.guardarReclamo(reclamo));
     }
@@ -64,6 +65,8 @@ public class ReclamoController {
     public ResponseEntity<Reclamo> crearReclamo(
             @Valid @RequestPart("reclamo") ReclamoRequest request,
             @RequestPart(value = "imagen", required = false) MultipartFile imagen) throws IOException {
+        if (request == null) return ResponseEntity.badRequest().build();
+
         Reclamo reclamo = new Reclamo(
                 request.categoria(),
                 request.direccion(),
@@ -73,22 +76,21 @@ public class ReclamoController {
         Path uploadedFile = null;
 
         if (imagen != null && !imagen.isEmpty()) {
-            String extension = obtenerExtension(imagen.getContentType());
-            if (extension == null) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            Path uploadDirectory = Paths.get("uploads");
+            String extension = ImageFileValidator.validateAndGetExtension(imagen);
+            Path uploadDirectory = Paths.get("uploads").toAbsolutePath().normalize();
             Files.createDirectories(uploadDirectory);
             String fileName = UUID.randomUUID() + extension;
-            uploadedFile = uploadDirectory.resolve(fileName);
+            uploadedFile = uploadDirectory.resolve(fileName).normalize();
+            if (!uploadedFile.startsWith(uploadDirectory)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La ruta de la imagen no es válida.");
+            }
             try {
                 Files.copy(imagen.getInputStream(), uploadedFile);
             } catch (IOException | RuntimeException exception) {
                 eliminarArchivoSubido(uploadedFile, exception);
                 throw exception;
             }
-            reclamo.setImagenPath(uploadedFile.toString());
+            reclamo.setImagenPath("/uploads/" + fileName);
         }
 
         try {
@@ -141,25 +143,20 @@ public class ReclamoController {
     public ResponseEntity<Reclamo> actualizarEstadoReclamo(
             @PathVariable Long id,
             @Valid @RequestBody EstadoRequest request) {
+        if (request == null || request.estado() == null) return ResponseEntity.badRequest().build();
+
         String nuevoEstado = request.estado().trim().toUpperCase(Locale.ROOT);
         if (!Set.of("PENDIENTE", "EN_PROCESO", "RESUELTO").contains(nuevoEstado)) {
             return ResponseEntity.badRequest().build();
         }
 
         // Buscamos el reclamo usando el servicio
-        List<Reclamo> todos = reclamoService.obtenerTodosLosReclamos();
-        Reclamo reclamoEncontrado = todos.stream()
-                .filter(r -> r.getId().equals(id))
-                .findFirst()
-                .orElse(null);
-
-        if (reclamoEncontrado == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        reclamoEncontrado.setEstado(nuevoEstado);
-        Reclamo actualizado = reclamoService.guardarReclamo(reclamoEncontrado);
-        return ResponseEntity.ok(actualizado);
+        return reclamoService.buscarPorId(id)
+                .map(reclamo -> {
+                    reclamo.setEstado(nuevoEstado);
+                    return ResponseEntity.ok(reclamoService.guardarReclamo(reclamo));
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public record EstadoRequest(@NotBlank String estado) {
@@ -170,20 +167,6 @@ public class ReclamoController {
             String categoria,
             String estado,
             LocalDateTime fechaCreacion) {
-    }
-
-    private String obtenerExtension(String contentType) {
-        if (contentType == null) {
-            return null;
-        }
-
-        return switch (contentType.toLowerCase(Locale.ROOT)) {
-            case "image/jpeg" -> ".jpg";
-            case "image/png" -> ".png";
-            case "image/gif" -> ".gif";
-            case "image/webp" -> ".webp";
-            default -> null;
-        };
     }
 
     private void eliminarArchivoSubido(Path file, Exception exception) {
@@ -219,7 +202,7 @@ public class ReclamoController {
             @Size(max = 255, message = "La ruta de imagen no debe superar los 255 caracteres")
             String imagenPath,
 
-            String userName,
-            String userEmail) {
+            @Size(max = 120) String userName,
+            @Email @Size(max = 150) String userEmail) {
     }
 }

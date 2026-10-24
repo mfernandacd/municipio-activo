@@ -33,10 +33,10 @@ public class Noticia {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = false, length = 1000)
+    @Column(length = 1000)
     private String image;
 
-    @Column(name = "image_alt", nullable = false, length = 180)
+    @Column(name = "image_alt", length = 180)
     private String imageAlt;
 
     @Column(nullable = false)

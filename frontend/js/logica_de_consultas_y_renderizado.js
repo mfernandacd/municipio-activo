@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     inputCodigo.disabled = true;
 
     try {
-      const response = await fetch(`/api/reclamos/seguimiento/${encodeURIComponent(codigo)}`, {
+      const endpoint = window.municipioApiUrl(`/api/reclamos/seguimiento/${encodeURIComponent(codigo)}`);
+      const response = await window.municipioFetch(endpoint, {
         method: 'GET',
         headers: {
           'Accept': 'application/json'

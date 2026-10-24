@@ -1,8 +1,9 @@
 package com.municipioactivo.backend;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -32,15 +35,19 @@ public class SecurityConfig {
     // Proporciona el codificador BCrypt usado para almacenar y validar contraseñas.
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(12);
     }
 
     @Bean
     // Define qué endpoints son públicos y cuáles requieren autenticación.
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
+            .csrf(csrf -> csrf
+                    .csrfTokenRepository(new HttpSessionCsrfTokenRepository())
+                    .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session
+                    .sessionFixation(sessionFixation -> sessionFixation.changeSessionId()))
             .formLogin(formLogin -> formLogin.disable())
             .httpBasic(httpBasic -> httpBasic.disable())
             .authorizeHttpRequests(auth -> auth
@@ -50,6 +57,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/api/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/registro").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/session").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/reclamos").permitAll()
@@ -65,8 +73,12 @@ public class SecurityConfig {
                             usuarioEsAdministrativo(authentication.get())))
                 .requestMatchers(HttpMethod.GET, "/api/reclamos/seguimiento/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reclamos", "/api/reclamos/**")
-                    .hasRole("ADMINISTRATIVO")
-                .requestMatchers(HttpMethod.PUT, "/api/reclamos", "/api/reclamos/**").hasRole("ADMINISTRATIVO")
+                    .access((authentication, context) -> new AuthorizationDecision(
+                            usuarioEsAdministrativo(authentication.get())))
+                .requestMatchers(HttpMethod.PUT, "/api/reclamos", "/api/reclamos/**")
+                    .access((authentication, context) -> new AuthorizationDecision(
+                            usuarioEsAdministrativo(authentication.get())))
+                .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                 .anyRequest().denyAll());
 
         return http.build();
@@ -79,12 +91,6 @@ public class SecurityConfig {
             return false;
         }
 
-        boolean tieneRolEnSesion = authentication.getAuthorities().stream()
-                .anyMatch(a -> "ROLE_ADMINISTRATIVO".equalsIgnoreCase(a.getAuthority()));
-        if (tieneRolEnSesion) {
-            return true;
-        }
-
         return usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(authentication.getName())
                 .map(usuario -> "administrativo".equalsIgnoreCase(usuario.getRol()))
                 .orElse(false);
@@ -94,16 +100,14 @@ public class SecurityConfig {
     // Permite llamadas del frontend local y de los orígenes de despliegue configurados.
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        List<String> allowedOriginPatterns = new ArrayList<>(
-            List.of("http://localhost:*", "http://127.0.0.1:*", "https://*.onrender.com", "https://*.render.com"));
-        for (String origin : frontendOrigins.split(",")) {
-            if (!origin.isBlank()) {
-                allowedOriginPatterns.add(origin.trim());
-            }
-        }
-        configuration.setAllowedOriginPatterns(allowedOriginPatterns);
+        List<String> allowedOrigins = Arrays.stream(frontendOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("Content-Type", "Accept", "Authorization", "X-Requested-With"));
+        configuration.setAllowedHeaders(List.of(
+                "Content-Type", "Accept", "Authorization", "X-Requested-With", "X-CSRF-TOKEN"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

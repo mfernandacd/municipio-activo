@@ -4,24 +4,28 @@
     1. BASE Y VARIABLES GLOBALES - IDENTIDAD MUNICIPIO SERRANOBLE
     ========================================================== */
 :root {
-    /* Paleta Oficial Municipio Serranoble */
-    --serranoble-navy: #0A2240;      /* Azul noche profundo del escudo */
-    --serranoble-navy-dark: #06162B; /* Azul ultra oscuro para headers */
-    --serranoble-navy-light: #16355C;/* Azul medio para bordes/acentos */
-    --serranoble-gold: #E5B83A;      /* Dorado espiga oficial */
-    --serranoble-gold-hover: #D4A426;/* Dorado para hover */
-    --serranoble-gold-light: #FFF8E1;/* Fondo crema con tinte dorado */
-    --serranoble-brown: #7C4328;     /* Café / Marrón de las montañas */
-    --serranoble-brown-light: #A35D3B;
-    --serranoble-cream: #FAF6EE;     /* Crema elegante de acentos */
-
-    --color-primary: #0A2240;        /* Color principal institucional */
-    --color-secondary: #E5B83A;      /* Color de apoyo oficial */
-    --color-bg-light: #f8f9fa;       /* Fondo claro para secciones */
-    --color-text-dark: #1e293b;      /* Texto principal sobre fondo claro */
-    --color-accent: #7C4328;         /* Acento marrón montañas */
+    --bs-primary: #0A2240;
+    --bs-primary-rgb: 10, 34, 64;
+    --bs-link-color: #0A2240;
+    --bs-link-hover-color: #06162B;
+    --bs-focus-ring-color: rgba(10, 34, 64, 0.25);
+    --color-primary: #0A2240;
+    --color-primary-dark: #06162B;
+    --color-primary-soft: #16355C;
+    --color-secondary: #E5B83A;
+    --color-secondary-hover: #D4A426;
+    --color-secondary-light: #FFF8E1;
+    --color-accent: #7C4328;
+    --color-bg-light: #F8F9FA;
+    --color-white: #FFFFFF;
+    --color-text-dark: #1E293B;
+    --color-text-muted: #5A6978;
+    --color-border: #DBE4ED;
     --font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     --font-family-brand: 'Cinzel', serif;
+    --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+    --radius-lg: 1.125rem;
+    --radius-md: 0.75rem;
 }
 
 .font-brand {
@@ -57,16 +61,13 @@ body {
     color: var(--color-text-dark);
     background: radial-gradient(circle, #F8FAFC 0%, #0F172A 100%);
     min-height: 100vh;
-    display: flex; /* Establece la estructura vertical de la pÃ¡gina */
-    flex-direction: column; /* Mantiene el footer pegado al fondo incluso con poco contenido */
+    display: flex;
+    flex-direction: column;
+    line-height: 1.6;
 }
 
 body[data-auth-required] > :not(script) {
     visibility: hidden;
-}
-
-main .container {
-    max-width: 1200px;
 }
 
 .home-zone {
@@ -90,16 +91,54 @@ main .container {
    ========================================================== */
 header .navbar {
     background-color: var(--color-primary) !important;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    /* Usamos la misma variable y grosor que el footer: */
-    border-bottom: 3px solid var(--color-accent);
+    box-shadow: 0 2px 12px rgba(6, 22, 43, 0.18);
+    border-bottom: 3px solid var(--color-secondary);
+}
+
+.site-navbar .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+    flex-wrap: wrap;
+}
+
+.site-navbar .navbar-brand {
+    flex-shrink: 0;
+}
+
+.site-navbar-links {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 36rem;
+    justify-content: flex-end;
+}
+
+.site-navbar .navbar-nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.15rem;
+}
+
+.site-navbar .navbar-nav .nav-link {
+    white-space: nowrap;
 }
 
 .navbar-brand span {
     font-weight: 700;
-    font-size: 1.5rem; 
+    font-size: 1.5rem;
     letter-spacing: 0.5px;
+}
+
+.navbar-brand img {
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px solid rgba(229, 184, 58, 0.55);
+    border-radius: 0.65rem;
+    object-fit: cover;
 }
 
 .nav-link {
@@ -107,23 +146,52 @@ header .navbar {
     font-size: 1.1rem;
     padding: 0.5rem 1.2rem !important;
     transition: color 0.2s ease-in-out;
-    border-right: none;
 }
 
-/* Ponemos la lÃ­nea vertical solo entre los primeros elementos, excluyendo los Ãºltimos dos */
 .navbar-nav .nav-item:not(:last-child):not(:nth-last-child(2)) .nav-link {
     border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
 
+.nav-link.active,
 .nav-link:hover {
-    color: #e2e6ea !important;
+    color: var(--color-secondary) !important;
+}
+
+.navbar .btn-outline-light:hover {
+    color: var(--color-primary);
+}
+
+@media (max-width: 767.98px) {
+    .site-navbar .container {
+        align-items: flex-start;
+    }
+
+    .site-navbar-links {
+        flex-basis: 100%;
+        justify-content: flex-start;
+    }
+
+    .site-navbar .navbar-nav {
+        justify-content: flex-start;
+        gap: 0.1rem 0.25rem;
+    }
+
+    .site-navbar .navbar-nav .nav-link {
+        padding: 0.4rem 0.55rem !important;
+        border-right: 0 !important;
+        font-size: 0.9rem;
+    }
+
+    .site-navbar .navbar-nav .btn {
+        margin-left: 0.3rem !important;
+    }
 }
 
 /* ==========================================================
-   3. ESTRUCTURA PRINCIPAL Y PIE DE PÃGINA
+   3. ESTRUCTURA PRINCIPAL Y PIE DE PÁGINA
    ========================================================== */
 main {
-    flex: 1; /* Hace que el contenido principal ocupe el espacio disponible y empuje el footer hacia abajo */
+    flex: 1;
 }
 
 .hero {
@@ -138,9 +206,10 @@ main {
 }
 
 footer {
-    background: linear-gradient(180deg, #1d232b 0%, #12181f 100%);
+    background: var(--color-primary-dark);
+    color: var(--color-white);
     font-size: 0.9rem;
-    border-top: 3px solid var(--color-accent); /* LÃ­nea superior de acento para diferenciar el pie de pÃ¡gina */
+    border-top: 3px solid var(--color-secondary);
 }
 
 footer h5,
@@ -168,7 +237,7 @@ footer p {
    4. NOTICIAS
    ========================================================== */
 .title-section {
-    color: #0d47a1;
+    color: var(--color-primary);
     letter-spacing: 1px;
 }
 
@@ -186,7 +255,7 @@ footer p {
     object-fit: cover;
     width: 100%;
     
-    /* Agregamos el marco negro/gris que tienen las noticias pequeÃ±as */
+    /* Agregamos el marco negro/gris que tienen las noticias pequeñas */
     background-color: #0b1728;            /* Fondo oscuro por si la imagen no cubre todo */
     border: 2px solid #1e293b;            /* Borde gris/oscuro alrededor de la imagen */
     border-bottom: 2px solid #1e293b;     /* O separador con el texto */
@@ -211,13 +280,13 @@ footer p {
 }
 
 .carousel-noticias::-webkit-scrollbar-thumb {
-    background: #0d6efd;
+    background: var(--color-primary);
     border-radius: 4px;
 }
 
 .card-secundaria {
-    width: 280px; /* Ancho fijo para permitir el desplazamiento horizontal y mantener el diseÃ±o consistente */
-    border: 2px solid #0d6efd;
+    width: 280px; /* Ancho fijo para permitir el desplazamiento horizontal y mantener el diseño consistente */
+    border: 2px solid var(--color-primary);
 }
 
 .card-secundaria img {
@@ -228,13 +297,13 @@ footer p {
 /* ==========================================================
     5. TRAMITES, SERVICIOS Y DENUNCIAS
     ========================================================== */
-/* Las tarjetas de trÃ¡mites reutilizan clases de Bootstrap y este bloque queda reservado para
-   ajustes especÃ­ficos de la secciÃ³n sin alterar el estilo base del framework. */
+/* Las tarjetas de trámites reutilizan clases de Bootstrap y este bloque queda reservado para
+   ajustes específicos de la sección sin alterar el estilo base del framework. */
 
 /* ==========================================================
-    6. ACCESIBILIDAD: BOTÃ“N FLOTANTE Y PANEL
+    6. ACCESIBILIDAD: BOTÓN FLOTANTE Y PANEL
     ========================================================== */
-/* BotÃ³n visible en la esquina inferior derecha que abre el panel de accesibilidad */
+/* Botón visible en la esquina inferior derecha que abre el panel de accesibilidad */
 .btn-accesibilidad {
     position: fixed;
     bottom: 20px;
@@ -242,8 +311,8 @@ footer p {
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background-color: #0066cc;
-    border: 2px solid #ffffff;
+    background-color: var(--color-primary);
+    border: 2px solid var(--color-secondary);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     z-index: 9999;
     cursor: pointer;
@@ -257,9 +326,9 @@ footer p {
     transform: scale(1.08);
 }
 
-.btn-accesibilidad img {
-    width: 35px;
-    height: 35px;
+.btn-accesibilidad svg {
+    width: 30px;
+    height: 30px;
 }
 
 .panel-accesibilidad {
@@ -272,11 +341,11 @@ footer p {
     max-height: 100vh;
     overflow-y: auto;
     border-radius: 0;
-    background: #f5f7fa;
+    background: var(--color-bg-light);
     box-shadow: 2px 8px 60px -2px rgba(0, 0, 0, 0.2);
     z-index: 9998;
-    color: #17243a;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--color-text-dark);
+    font-family: var(--font-family-base);
     font-size: 16px;
     line-height: 1.7;
 }
@@ -296,7 +365,7 @@ footer p {
     padding: 4px 9px;
     border: 0;
     border-radius: 12px;
-    background: #0d6efd;
+    background: var(--color-primary);
     color: #ffffff;
     font-size: 0.72rem;
     cursor: pointer;
@@ -326,7 +395,7 @@ footer p {
     padding: 6px 8px;
     border: 0;
     background: transparent;
-    color: #17243a;
+    color: var(--color-text-dark);
     font-size: 0.72rem;
     text-align: left;
 }
@@ -336,7 +405,7 @@ footer p {
     padding: 44px 20px 22px;
     text-align: center;
     color: #ffffff;
-    background: #1473e6;
+    background: var(--color-primary);
 }
 
 .panel-accesibilidad-header h2 {
@@ -357,7 +426,7 @@ footer p {
     margin: 0 auto;
     border-radius: 50%;
     background: #ffffff;
-    color: #1473e6;
+    color: var(--color-primary);
     font-size: 1.2rem;
 }
 
@@ -378,7 +447,7 @@ footer p {
 }
 
 .accesibilidad-seccion {
-    /* Cada bloque del panel agrupa ajustes relacionados con una categorÃ­a de accesibilidad */
+    /* Cada bloque del panel agrupa ajustes relacionados con una categoría de accesibilidad */
     margin-bottom: 12px;
     padding: 14px;
     border-radius: 10px;
@@ -392,14 +461,14 @@ footer p {
 }
 
 .accesibilidad-grid {
-    /* DistribuciÃ³n en dos columnas para presentar todas las opciones de ajustes de forma compacta */
+    /* Distribución en dos columnas para presentar todas las opciones de ajustes de forma compacta */
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
 }
 
 .control-tamano-fuente {
-    /* Fila de control para cambiar el tamaÃ±o de letra con botones rÃ¡pidos */
+    /* Fila de control para cambiar el tamaño de letra con botones rápidos */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -407,7 +476,7 @@ footer p {
     margin-bottom: 8px;
     padding: 12px 14px;
     border-radius: 5px;
-    background: #f5f7fa;
+    background: var(--color-bg-light);
     font-size: 0.72rem;
 }
 
@@ -426,7 +495,7 @@ footer p {
     padding: 0;
     border: 0;
     border-radius: 50%;
-    background: #1473e6;
+    background: var(--color-primary);
     color: #ffffff;
     font-size: 1.1rem;
     line-height: 1;
@@ -446,16 +515,16 @@ footer p {
 
 .control-predeterminado:hover,
 .control-predeterminado:focus-visible {
-    color: #1473e6;
+    color: var(--color-primary);
 }
 
 .accesibilidad-grid-three {
-    /* En secciones con mÃ¡s opciones, se usa una disposiciÃ³n de 3 columnas */
+    /* En secciones con más opciones, se usa una disposición de 3 columnas */
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .accesibilidad-opcion {
-    /* Cada opciÃ³n del panel funciona como botÃ³n de ajuste visual */
+    /* Cada opción del panel funciona como botón de ajuste visual */
     display: flex;
     min-height: 68px;
     flex-direction: column;
@@ -465,8 +534,8 @@ footer p {
     padding: 8px 5px;
     border: 2px solid transparent;
     border-radius: 5px;
-    background: #f5f7fa;
-    color: #1c2c43;
+    background: var(--color-bg-light);
+    color: var(--color-text-dark);
     font-size: 0.64rem;
     text-align: center;
     cursor: pointer;
@@ -475,30 +544,30 @@ footer p {
 .accesibilidad-opcion:hover,
 .accesibilidad-opcion:focus-visible,
 .accesibilidad-opcion.activo {
-    border-color: #1473e6;
-    background: #e8f1ff;
+    border-color: var(--color-primary);
+    background: var(--color-secondary-light);
 }
 
 .opcion-icon {
-    /* Icono pequeÃ±o dentro de cada ajuste para reforzar su significado */
+    /* Icono pequeño dentro de cada ajuste para reforzar su significado */
     display: grid;
     place-items: center;
     width: 24px;
     height: 24px;
     border-radius: 50%;
     background: #ffffff;
-    color: #1473e6;
+    color: var(--color-primary);
     font-size: 0.8rem;
     font-weight: 700;
 }
 
 .btn-restablecer-accesibilidad {
-    /* BotÃ³n para volver a los valores visuales por defecto del sitio */
+    /* Botón para volver a los valores visuales por defecto del sitio */
     width: 100%;
     padding: 8px;
     border: 0;
     border-radius: 5px;
-    background: #1473e6;
+    background: var(--color-primary);
     color: #ffffff;
     font-size: 0.8rem;
     cursor: pointer;
@@ -506,10 +575,10 @@ footer p {
 
 .btn-restablecer-accesibilidad:hover,
 .btn-restablecer-accesibilidad:focus-visible {
-    background: #0b5ed7;
+    background: var(--color-primary-dark);
 }
 
-/* Accesibilidad: cambios de contenido para mejorar lectura y navegaciÃ³n */
+/* Accesibilidad: cambios de contenido para mejorar lectura y navegación */
 body.fuente-legible {
     font-family: Arial, sans-serif;
 }
@@ -538,7 +607,7 @@ body.fuente-negrita a {
     font-weight: 700;
 }
 
-/* Accesibilidad: ajustes de color y contraste para usuarios con baja visiÃ³n */
+/* Accesibilidad: ajustes de color y contraste para usuarios con baja visión */
 body.contraste-claro {
     background: #ffffff !important;
     color: #000000 !important;
@@ -553,14 +622,14 @@ body.ocultar-imagenes header img {
     visibility: hidden;
 }
 
-/* Accesibilidad: ayudas de lectura y orientaciÃ³n para focalizar contenido */
+/* Accesibilidad: ayudas de lectura y orientación para focalizar contenido */
 body.linea-lectura::after {
     position: fixed;
     top: calc(var(--cursor-y, 50vh) - 2px);
     left: 0;
     width: 100%;
     height: 3px;
-    background: #1473e6;
+    background: var(--color-primary);
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.12);
     content: "";
     pointer-events: none;
@@ -573,8 +642,8 @@ body.mascara-lectura::after {
     left: 0;
     width: 100%;
     height: 160px;
-    border-top: 3px solid #1473e6;
-    border-bottom: 3px solid #1473e6;
+    border-top: 3px solid var(--color-primary);
+    border-bottom: 3px solid var(--color-primary);
     box-shadow: 0 -100vh 0 100vh rgba(0, 0, 0, 0.28), 0 100vh 0 100vh rgba(0, 0, 0, 0.28);
     content: "";
     pointer-events: none;
@@ -595,7 +664,7 @@ body.resaltar-enlaces a {
 }
 
 body.resaltar-contenido main > * {
-    outline: 2px solid #1473e6;
+    outline: 2px solid var(--color-primary);
     outline-offset: 3px;
 }
 
@@ -615,7 +684,7 @@ body.alto-contraste section {
 /* ==========================================================
    7. RESPONSIVE
    ========================================================== */
-/* Ajustes de layout para pantallas pequeÃ±as y tablets */
+/* Ajustes de layout para pantallas pequeñas y tablets */
 @media (max-width: 768px) {
     .hero {
         padding: 2rem 1rem;
@@ -638,14 +707,14 @@ body.alto-contraste section {
 
 /* Seccion Hero / Bienvenidos */
 .hero-bienvenidos {
-    background-color: #F3F4F6;
+    background-color: var(--color-white);
     padding: 60px 50px;
     border-radius: 28px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
     
-    /* Expandimos el contenedor hacia los lados segÃºn marcaste en las flechas */
+    /* Expandimos el contenedor hacia los lados según marcaste en las flechas */
     max-width: 1350px;  /* Aumentamos de 1100px a 1350px para estirarlo a lo ancho */
-    width: 100%;        /* Hace que ocupe todo el ancho disponible hasta ese lÃ­mite */
+    width: 100%;        /* Hace que ocupe todo el ancho disponible hasta ese límite */
     margin: 0 auto 4rem auto; 
     min-height: 85vh;   
     
@@ -671,8 +740,8 @@ body.alto-contraste section {
 
 .badge-bienvenidos {
     display: inline-block;
-    background-color: #e2e8f0;
-    color: #1e3a8a;
+    background-color: var(--color-border);
+    color: var(--color-primary);
     font-size: 0.85rem;
     font-weight: 600;
     padding: 6px 14px;
@@ -681,21 +750,21 @@ body.alto-contraste section {
 }
 
 .hero-title {
-    font-size: clamp(2.8rem, 4.2vw, 3.8rem); /* Letras mÃ¡s grandes */
+    font-size: clamp(2.8rem, 4.2vw, 3.8rem);
     font-weight: 800;
-    color: #0f172a;
+    color: var(--color-primary-dark);
     line-height: 1.15;
     margin-bottom: 20px;
     text-transform: none;
 }
 
 .hero-title .text-highlight {
-    color: #1d4ed8;
+    color: var(--color-accent);
 }
 
 .hero-description {
     font-size: 1rem;
-    color: #475569;
+    color: var(--color-text-muted);
     line-height: 1.5;
     margin-bottom: 24px;
     max-width: 480px;
@@ -707,49 +776,119 @@ body.alto-contraste section {
     flex-wrap: wrap;
 }
 
+.btn {
+    border-radius: 0.6rem;
+    font-weight: 600;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
 .btn-primary {
-    background-color: #1d4ed8;
-    color: #ffffff !important;
-    border: 1px solid #1d4ed8;
+    --bs-btn-color: var(--color-white);
+    --bs-btn-bg: var(--color-primary);
+    --bs-btn-border-color: var(--color-primary);
+    --bs-btn-hover-color: var(--color-white);
+    --bs-btn-hover-bg: var(--color-primary-dark);
+    --bs-btn-hover-border-color: var(--color-primary-dark);
+    --bs-btn-active-color: var(--color-white);
+    --bs-btn-active-bg: var(--color-primary-dark);
+    --bs-btn-active-border-color: var(--color-primary-dark);
+    --bs-btn-disabled-bg: var(--color-primary);
+    --bs-btn-disabled-border-color: var(--color-primary);
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+    border-color: var(--color-primary-dark);
+    background-color: var(--color-primary-dark);
+    color: var(--color-white);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--color-primary);
+    --bs-btn-border-color: var(--color-primary);
+    --bs-btn-hover-color: var(--color-white);
+    --bs-btn-hover-bg: var(--color-primary);
+    --bs-btn-hover-border-color: var(--color-primary);
+    --bs-btn-active-color: var(--color-white);
+    --bs-btn-active-bg: var(--color-primary-dark);
+    --bs-btn-active-border-color: var(--color-primary-dark);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus-visible {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary);
+    color: var(--color-white);
+}
+
+.btn-secondary,
+.btn-success {
+    --bs-btn-color: var(--color-primary);
+    --bs-btn-bg: var(--color-secondary);
+    --bs-btn-border-color: var(--color-secondary);
+    --bs-btn-hover-color: var(--color-primary-dark);
+    --bs-btn-hover-bg: var(--color-secondary-hover);
+    --bs-btn-hover-border-color: var(--color-secondary-hover);
+    --bs-btn-active-color: var(--color-primary-dark);
+    --bs-btn-active-bg: var(--color-secondary-hover);
+    --bs-btn-active-border-color: var(--color-secondary-hover);
+    --bs-btn-disabled-bg: var(--color-secondary);
+    --bs-btn-disabled-border-color: var(--color-secondary);
+    border-color: var(--color-secondary);
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus-visible,
+.btn-success:hover,
+.btn-success:focus-visible {
+    border-color: var(--color-secondary-hover);
+    background-color: var(--color-secondary-hover);
+    color: var(--color-primary-dark);
+}
+
+.form-control,
+.form-select {
+    border-color: var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--color-primary-soft);
+    box-shadow: 0 0 0 0.2rem rgba(22, 53, 92, 0.15);
+}
+
+
+
+.hero-buttons .btn {
     padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
     text-decoration: none;
 }
 
-.btn-primary:hover {
-    background-color: #1e40af;
-}
 
-.btn-secondary {
-    background-color: #ffffff;
-    color: #1d4ed8 !important;
-    border: 1px solid #1d4ed8;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.btn-secondary:hover {
-    background-color: #f1f5f9;
-}
 
 .hero-image-card {
-    flex: 0 0 54%; /* Un poquito mÃ¡s de ancho para la tarjeta */
+    flex: 0 0 54%; /* Un poquito más de ancho para la tarjeta */
     max-width: 54%;
-    background: #0f2537;
+    background: var(--color-primary-dark);
     padding: 12px;
     border-radius: 24px;
     box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.12);
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--color-primary-soft);
     box-sizing: border-box;
 }
 
 
 .municipio-img {
     width: 100%;
-    height: 440px; /* AquÃ­ recupera el alto rectangular que querÃ­as */
+    height: 440px; /* Aquí recupera el alto rectangular que querías */
     object-fit: cover;
     border-radius: 16px;
     display: block;
@@ -766,13 +905,13 @@ body.alto-contraste section {
 }
 
 
-/* Altura uniforme solo para las 4 imÃ¡genes secundarias de abajo */
+/* Altura uniforme solo para las 4 imágenes secundarias de abajo */
 #noticias .row-cols-md-4 .card-img-top {
     height: 180px !important;
     object-fit: cover !important;
 }
 
-/* Restablecemos la imagen principal destacada a su tamaÃ±o normal */
+/* Restablecemos la imagen principal destacada a su tamaño normal */
 #noticia-destacada-imagen {
     height: auto !important;
     max-height: 400px;

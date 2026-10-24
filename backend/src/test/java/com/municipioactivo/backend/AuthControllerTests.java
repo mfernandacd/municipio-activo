@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -68,15 +69,41 @@ class AuthControllerTests {
     }
 
     @Test
+    void loginAcceptsLegacyUserWithNullPrivileges() {
+        UsuarioRepository usuarioRepository = org.mockito.Mockito.mock(UsuarioRepository.class);
+        PasswordEncoder passwordEncoder = org.mockito.Mockito.mock(PasswordEncoder.class);
+        AuthController controller = new AuthController(usuarioRepository, passwordEncoder);
+        Usuario usuario = new Usuario("usuario@example.com", "hash", "Usuario", "ciudadano", null);
+        when(usuarioRepository.findByEmailIgnoreCaseAndActivoTrue("usuario@example.com"))
+                .thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("Clave26", "hash")).thenReturn(true);
+        when(passwordEncoder.upgradeEncoding("hash")).thenReturn(false);
+
+        HttpServletRequest request = org.mockito.Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = org.mockito.Mockito.mock(HttpServletResponse.class);
+        HttpSession session = org.mockito.Mockito.mock(HttpSession.class);
+        when(request.getSession(false)).thenReturn(null);
+        when(request.getSession(true)).thenReturn(session);
+
+        var loginResponse = controller.login(
+                new AuthController.LoginRequest("usuario@example.com", "Clave26"), request, response);
+
+        assertEquals(HttpStatus.OK, loginResponse.getStatusCode());
+        assertEquals("", ((java.util.Map<?, ?>) loginResponse.getBody()).get("privilegios"));
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
     void registrationNeverAssignsAdministrativeRoleBasedOnEmailDomain() {
         UsuarioRepository usuarioRepository = org.mockito.Mockito.mock(UsuarioRepository.class);
         PasswordEncoder passwordEncoder = org.mockito.Mockito.mock(PasswordEncoder.class);
         AuthController controller = new AuthController(usuarioRepository, passwordEncoder);
         when(usuarioRepository.findByEmailIgnoreCase("empleado@serranoble.gob.ar")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("Clave26")).thenReturn("bcrypt-hash");
+        when(passwordEncoder.encode("ClaveSegura26!")).thenReturn("bcrypt-hash");
 
         var response = controller.registrarUsuario(
-                new AuthController.RegistroRequest("Empleado Municipal", "empleado@serranoble.gob.ar", "Clave26"));
+                new AuthController.RegistroRequest(
+                        "Empleado Municipal", "empleado@serranoble.gob.ar", "ClaveSegura26!"));
 
         ArgumentCaptor<Usuario> usuarioCaptor = ArgumentCaptor.forClass(Usuario.class);
         verify(usuarioRepository).save(usuarioCaptor.capture());
@@ -86,12 +113,12 @@ class AuthControllerTests {
     }
 
     @Test
-    void registrationRejectsPasswordsOutsideTheSixToEightCharacterAlphanumericRule() {
+    void registrationRejectsPasswordsShorterThanTwelveCharactersOrLongerThanBcryptLimit() {
         UsuarioRepository usuarioRepository = org.mockito.Mockito.mock(UsuarioRepository.class);
         PasswordEncoder passwordEncoder = org.mockito.Mockito.mock(PasswordEncoder.class);
         AuthController controller = new AuthController(usuarioRepository, passwordEncoder);
 
-        for (String password : new String[]{"Ab123", "Ab12!6", "Ab1234567"}) {
+        for (String password : new String[]{"Ab123", "Ab12!6", "Clave26", "A".repeat(73)}) {
             var response = controller.registrarUsuario(new AuthController.RegistroRequest(
                     "Usuario", "usuario@example.com", password));
 

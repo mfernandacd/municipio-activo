@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             </div>
             <button type="button" id="btn-accesibilidad" class="btn-accesibilidad" aria-label="Ajustes de accesibilidad" aria-expanded="false" aria-controls="panel-accesibilidad">
-                <img src="https://www.munichile.cl/wp-content/plugins/accessibility-onetap/assets/images/admin/Original_Logo_Icon.svg" alt="Icono de accesibilidad">
+                <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.5"></circle><path d="M12 8v6m-5-4 5-2 5 2m-7 2-3 7m5-7 3 7"></path></svg>
             </button>`);
     }
 

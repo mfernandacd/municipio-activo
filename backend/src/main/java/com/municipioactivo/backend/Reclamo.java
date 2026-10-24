@@ -1,18 +1,16 @@
 package com.municipioactivo.backend;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.UUID;
 
 // Entidad JPA que representa un reclamo municipal en la base de datos.
@@ -52,7 +50,7 @@ public class Reclamo {
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
-    @Column(name = "codigo_seguimiento", nullable = false, length = 20)
+    @Column(name = "codigo_seguimiento", nullable = false, unique = true, length = 20)
     private String codigoSeguimiento;
 
     @PrePersist
@@ -101,68 +99,4 @@ public class Reclamo {
 
     public String getCodigoSeguimiento() { return codigoSeguimiento; }
     public void setCodigoSeguimiento(String codigoSeguimiento) { this.codigoSeguimiento = codigoSeguimiento; }
-}
-
-// Repositorio Spring Data que permite guardar y consultar reclamos.
-@Repository
-interface ReclamoRepository extends JpaRepository<Reclamo, Long> {
-    // Busca reclamos que tengan el estado indicado.
-    List<Reclamo> findByEstado(String estado);
-
-    Optional<Reclamo> findByCodigoSeguimientoIgnoreCase(String codigoSeguimiento);
-}
-
-// Define las operaciones de negocio disponibles para los reclamos.
-interface ReclamoService {
-    Reclamo guardarReclamo(Reclamo reclamo);
-    List<Reclamo> obtenerTodosLosReclamos();
-    List<Reclamo> obtenerReclamosPendientes();
-    List<Reclamo> obtenerReclamosPorEstado(String estado);
-    Optional<Reclamo> buscarPorCodigoSeguimiento(String codigoSeguimiento);
-}
-
-// Implementa la lógica de negocio delegando la persistencia en el repositorio.
-@Service
-class ReclamoServiceImpl implements ReclamoService {
-
-    private final ReclamoRepository reclamoRepository;
-
-    @Autowired
-    public ReclamoServiceImpl(ReclamoRepository reclamoRepository) {
-        this.reclamoRepository = reclamoRepository;
-    }
-
-    @Override
-    @Transactional
-    // Persiste un reclamo nuevo o actualiza uno existente.
-    public Reclamo guardarReclamo(Reclamo reclamo) {
-        return reclamoRepository.save(reclamo);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    // Obtiene todos los reclamos almacenados.
-    public List<Reclamo> obtenerTodosLosReclamos() {
-        return reclamoRepository.findAll();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    // Obtiene únicamente los reclamos pendientes.
-    public List<Reclamo> obtenerReclamosPendientes() {
-        return reclamoRepository.findByEstado("PENDIENTE");
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    // Normaliza el estado recibido y obtiene los reclamos correspondientes.
-    public List<Reclamo> obtenerReclamosPorEstado(String estado) {
-        return reclamoRepository.findByEstado(estado.toUpperCase(Locale.ROOT));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Reclamo> buscarPorCodigoSeguimiento(String codigoSeguimiento) {
-        return reclamoRepository.findByCodigoSeguimientoIgnoreCase(codigoSeguimiento);
-    }
 }

@@ -5,25 +5,22 @@
 
     if (encabezado) {
         encabezado.innerHTML = `
-            <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <nav class="navbar navbar-dark bg-primary site-navbar" aria-label="Navegación principal">
                 <div class="container">
                     <a class="navbar-brand d-flex align-items-center" href="index.html">
-                        <img src="assets/logo/Logo.jpeg" alt="Municipio Serranoble" class="me-2" height="80">
+                        <img src="assets/logo/Logo.jpeg" alt="Municipio Serranoble" class="me-2" width="52" height="52">
                         <span>Municipio Serranoble</span>
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="site-navbar-links">
                         <ul class="navbar-nav ms-auto">
                             <li class="nav-item">
                                 <a class="nav-link" href="index.html" data-nav="inicio">Inicio</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="index.html#noticias" data-nav="noticias">Noticias</a>
+                                <a class="nav-link" href="noticias.html" data-nav="noticias">Noticias</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="index.html#tramites" data-nav="tramites">Trámites / Reclamos</a>
+                                <a class="nav-link" href="servicios.html" data-nav="tramites">Trámites y servicios</a>
                             </li>
                             <li class="nav-item" data-admin-only hidden>
                                 <a class="nav-link" href="vista-reclamo.html" data-nav="gestionar-reclamos">Gestionar reclamos</a>
@@ -49,7 +46,8 @@
             'noticias.html': 'noticias',
             'noticia-detalle.html': 'noticias',
             'reclamos-municipal.html': 'tramites',
-            'reclamo_y_notificacion_mas_correo.html': 'tramites',
+            'servicios.html': 'tramites',
+            'seguimiento.html': 'tramites',
             'vista-reclamo.html': 'gestionar-reclamos',
             'administrar-noticias.html': 'administrar-noticias'
         };
@@ -64,6 +62,7 @@
     }
 
     if (pie) {
+        pie.className = 'site-footer py-4 mt-auto';
         pie.innerHTML = `
             <div class="container">
                 <div class="row text-center text-md-start g-3 align-items-center">

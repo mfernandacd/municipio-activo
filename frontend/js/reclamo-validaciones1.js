@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const direccionInput = document.getElementById('claimAddress') || document.getElementById('direccion');
     const descripcionInput = document.getElementById('claimDescription') || document.getElementById('descripcion');
     const googleMapsInput = document.getElementById('googleMapsUrl');
-    const imagenPathInput = document.getElementById('imagenPath');
 
     // Paneles de Servidor / BD
     const jsonOutput = document.getElementById('jsonOutput');
@@ -47,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Conectar botón para reiniciar simulación
+    // Conectar botón para restablecer el formulario
     if (btnResetAll) {
         btnResetAll.addEventListener('click', (e) => {
             e.preventDefault();
@@ -121,9 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 direccion: direccionVal || 'Ubicación informada en descripción',
                 googleMapsUrl: googleMapsInput ? googleMapsInput.value.trim() : '',
                 descripcion: descripcionVal,
-                imagenPath: imagenPathInput ? imagenPathInput.value.trim() : '',
                 userName: nombreVal || 'Vecino Serranoble',
-                userEmail: emailVal || 'vecino@serranoble.gob.ar'
+                userEmail: emailVal
             };
 
             await enviarReclamoAlServidor(payload);
@@ -138,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const endpoint = resolverApiUrl('/api/reclamos');
-            const response = await fetch(endpoint, {
+            const response = await window.municipioFetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -161,7 +159,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const reclamoGuardado = await response.json();
-            const trackingCode = reclamoGuardado.codigoSeguimiento || 'SER-2026-' + Math.floor(1000 + Math.random() * 9000);
+            const trackingCode = reclamoGuardado.codigoSeguimiento;
+            if (!trackingCode) {
+                throw new Error('El servidor registró el reclamo, pero no devolvió el código de seguimiento.');
+            }
             const fechaHora = reclamoGuardado.fechaCreacion
                 ? new Date(reclamoGuardado.fechaCreacion).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -172,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     municipio: "Serranoble",
                     tabla: "reclamos",
                     operacion: "INSERT",
-                    id: reclamoGuardado.id || 1,
+                    id: reclamoGuardado.id,
                     codigo_seguimiento: trackingCode,
                     vecino: {
                         nombre: payload.userName,
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     descripcion: reclamoGuardado.descripcion || payload.descripcion,
                     estado: reclamoGuardado.estado || "PENDIENTE",
                     creado_el: reclamoGuardado.fechaCreacion || new Date().toISOString(),
-                    notificacion_mail_enviada: true
+                    correo_de_confirmacion_simulado: true
                 };
                 jsonOutput.textContent = JSON.stringify(dbRecord, null, 2);
             }
@@ -193,7 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 2. Actualizar Bandeja de Entrada de Mail Simulado
-            if (mailTo) mailTo.textContent = `${payload.userName} <${payload.userEmail}>`;
+            if (mailTo) {
+                mailTo.textContent = payload.userEmail
+                    ? `${payload.userName} <${payload.userEmail}>`
+                    : payload.userName;
+            }
             if (mailSubject) mailSubject.textContent = `Confirmación Reclamo Serranoble [${trackingCode}]`;
             if (mailTimestamp) mailTimestamp.textContent = fechaHora;
             if (mailBodyName) mailBodyName.textContent = payload.userName;
@@ -203,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (mailEmptyState) mailEmptyState.classList.add('hidden');
             if (mailContent) mailContent.classList.remove('hidden');
-            if (mailCount) mailCount.textContent = '1 mensaje recibido';
+            if (mailCount) mailCount.textContent = '1 vista previa (simulada)';
 
             // 3. Notificación SweetAlert2
             if (typeof Swal !== 'undefined') {
@@ -212,14 +217,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: '¡Reclamo Registrado en Serranoble!',
                     html: `<p class="mb-2">Tu reclamo fue guardado exitosamente en el servidor.</p>
                            <p class="font-mono font-bold text-lg text-serranoble-navy">Código: <strong>${trackingCode}</strong></p>
-                           <p class="text-xs text-slate-500 mt-1">Se ha generado la notificación oficial para <strong>${payload.userEmail}</strong>.</p>`,
+                           <p class="text-xs text-slate-500 mt-1">Esta es una vista previa; no se envió un correo a <strong>${payload.userEmail}</strong>.</p>`,
                     confirmButtonColor: '#0A2240',
                     confirmButtonText: 'Aceptar'
                 });
             }
 
             // 4. Toast flotante
-            mostrarToast('¡Reclamo Registrado!', `Código ${trackingCode} generado y despachado.`);
+            mostrarToast('¡Reclamo registrado!', `Código ${trackingCode} listo para consultar.`);
 
         } catch (error) {
             console.error('Error al registrar reclamo:', error);
@@ -351,26 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resolverApiUrl(endpoint) {
-        const configuredBaseUrl = document.querySelector('meta[name="reclamos-api-base-url"]')?.content.trim()
-            || document.querySelector('meta[name="municipio-api-base-url"]')?.content.trim();
-
-        if (window.location.protocol === 'file:' && !configuredBaseUrl) {
-            console.warn('Ejecutando desde protocolo file://. Las llamadas a API pueden requerir un servidor web local.');
-        }
-
-        if (configuredBaseUrl) {
-            return new URL(endpoint.replace(/^\/+/, ''), `${configuredBaseUrl.replace(/\/+$/, '')}/`).toString();
-        }
-
-        if (window.location.port === '8080') {
-            return endpoint;
-        }
-
-        if (['localhost', '127.0.0.1'].includes(window.location.hostname)) {
-            return `${window.location.protocol}//${window.location.hostname}:8080${endpoint}`;
-        }
-
-        return endpoint;
+        return window.municipioApiUrl(endpoint, 'reclamos-api-base-url');
     }
 
     // Exponer helpers en window para accesibilidad si es necesario

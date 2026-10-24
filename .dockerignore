@@ -4,6 +4,9 @@
 .idea
 **/target
 **/build
+**/uploads
+.env
+.env.*
 frontend/Sql
 *.sql
 *.bat

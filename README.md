@@ -1,42 +1,84 @@
 # Municipio Activo
 
-Portal web municipal para registrarse, iniciar sesión y enviar reclamos.
+Portal web municipal para registrar y seguir reclamos, consultar noticias y administrar el contenido publicado. El backend Spring Boot sirve también los archivos estáticos del frontend.
 
-## Abrir el sitio
+La pantalla de reclamos muestra una vista previa de confirmación por correo; el proyecto no incluye todavía un servicio SMTP ni envía mensajes reales.
 
-[https://municipio-s25r.onrender.com/](https://municipio-s25r.onrender.com/)
+## Tecnologías y requisitos
 
-Los visitantes solo necesitan esta dirección. No tienen que instalar programas, iniciar Apache ni configurar la base de datos.
+- JDK 21.
+- MySQL 8 compatible.
+- Maven Wrapper incluido en `backend/`; no hace falta instalar Maven.
+- Docker es opcional para ejecutar la imagen de despliegue.
+- Las nuevas cuentas deben usar frases de contraseña de 12 a 72 bytes UTF-8; las cuentas previas mantienen acceso con su clave actual.
 
-## Cómo funciona
+La aplicación usa Spring Boot, Spring Web MVC, Spring Security, Spring Data JPA, Jakarta Validation, MySQL Connector/J, HTML, Bootstrap, Tailwind CSS y JavaScript.
 
-- **Sitio web y backend:** Render.
-- **Base de datos MySQL:** Clever Cloud.
-- **Conexión a la base:** el backend en Render usa las credenciales guardadas en las variables privadas del servicio. No se exponen a los visitantes ni deben guardarse en el repositorio.
-- **Inicio de sesión:** la sesión se conserva entre páginas mediante una cookie segura.
+## Configurar una base nueva
 
-## Límites del plan gratuito
+1. Crea una base MySQL con `utf8mb4`:
 
-Render Free duerme el sitio después de 15 minutos sin visitas. La primera visita posterior puede tardar aproximadamente un minuto mientras el servicio vuelve a arrancar. Las imágenes cargadas se guardan en almacenamiento temporal y se pueden borrar cuando el servicio se reinicia. El uso gratuito de Render no elimina posibles costos de la base MySQL en Clever Cloud.
+   ```sql
+   CREATE DATABASE municipio_activo
+       CHARACTER SET utf8mb4
+       COLLATE utf8mb4_unicode_ci;
+   ```
 
-## Cambios y nuevo despliegue
+2. Ejecuta [`frontend/Sql/schema.sql`](frontend/Sql/schema.sql) sobre esa base. El esquema crea las tablas vacías y no inserta cuentas ni reclamos.
 
-Render despliega el proyecto desde el repositorio conectado en GitHub y utiliza el [`Dockerfile`](Dockerfile) de la raíz. Para actualizar el sitio, guarda y sube los cambios a la rama que Render tiene configurada; Render inicia un nuevo despliegue. En la configuración privada de Render, mantén `SPRING_PROFILES_ACTIVE=cloud`, `SESSION_COOKIE_SECURE=true` y las variables `MYSQL_ADDON_HOST`, `MYSQL_ADDON_PORT`, `MYSQL_ADDON_DB`, `MYSQL_ADDON_USER` y `MYSQL_ADDON_PASSWORD`.
+3. Configura la conexión mediante variables de entorno. No guardes contraseñas en Git:
 
-Nunca publiques la contraseña de MySQL en GitHub, en el frontend ni en este archivo. Si se comparte accidentalmente, cámbiala en Clever Cloud y actualiza el valor privado en Render.
+   ```text
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_NAME=municipio_activo
+   DB_USER=usuario_app
+   DB_PASSWORD=contraseña_local
+   ```
 
-## Desarrollo local (opcional)
+   Si la página se sirve desde otro origen de desarrollo, añade su origen exacto en `FRONTEND_ORIGINS`, por ejemplo `http://localhost:5500`. No uses patrones comodín. En el despliegue habitual, frontend y API comparten origen y esta variable puede quedar vacía.
 
-Para probar el proyecto en Windows, ejecuta [`Iniciar Municipio.bat`](<Iniciar Municipio.bat>), introduce los datos de conexión MySQL y abre [http://localhost:8080/](http://localhost:8080/). Deja abierta la ventana del backend mientras trabajas. No uses `file://` ni la dirección de Apache/XAMPP: el inicio de sesión necesita el backend.
+4. Para crear una cuenta administrativa, primero regístrala desde el portal y luego ejecuta [`frontend/Sql/asignar-rol-administrativo.sql`](frontend/Sql/asignar-rol-administrativo.sql) tras sustituir el correo de ejemplo.
 
-## Base de datos y roles
+[`frontend/Sql/noticias_iniciales.sql`](frontend/Sql/noticias_iniciales.sql) carga noticias públicas de ejemplo y se puede ejecutar después del esquema. [`frontend/Sql/migracion_tabla_imagenes.sql`](frontend/Sql/migracion_tabla_imagenes.sql) es una migración para bases antiguas; no se necesita en una base recién creada con `schema.sql`.
 
-El registro crea cuentas de ciudadano; las contraseñas aceptan de 6 a 8 letras o números. Si todavía no están creadas las tablas, ejecuta una vez [`crear-esquema-clever-cloud.sql`](frontend/Sql/crear-esquema-clever-cloud.sql) desde la consola de la base. Para asignar permisos administrativos, primero registra las cuentas y luego usa [`asignar-roles-municipales.sql`](frontend/Sql/asignar-roles-municipales.sql).
+No se debe versionar un volcado de producción: contiene datos personales y hashes de contraseña. Si una copia anterior ya llegó a un remoto, hay que purgarla del historial y rotar cualquier credencial relacionada.
+
+## Iniciar localmente
+
+Desde PowerShell en la raíz del proyecto, configura las variables de la base local y ejecuta:
+
+```powershell
+$env:DB_HOST = 'localhost'
+$env:DB_PORT = '3306'
+$env:DB_NAME = 'municipio_activo'
+$env:DB_USER = 'usuario_app'
+$env:DB_PASSWORD = 'contraseña_local'
+.\backend\mvnw.cmd -f .\backend\pom.xml spring-boot:run
+```
+
+Abre [http://localhost:8080/](http://localhost:8080/). También puedes iniciar [`Iniciar Municipio.bat`](<Iniciar Municipio.bat>), que solicita los datos MySQL y ejecuta el backend. No abras las páginas con `file://`: las rutas de API, la sesión y la protección CSRF requieren que el sitio se sirva por HTTP.
+
+## API principal
+
+- `POST /api/auth/registro`, `POST /api/auth/login`, `GET /api/auth/session`, `POST /api/auth/logout`.
+- `GET /api/auth/csrf` entrega el token CSRF que usan las operaciones de escritura.
+- `POST /api/reclamos` registra un reclamo; `GET /api/reclamos/seguimiento/{código}` devuelve su seguimiento público.
+- `GET /api/reclamos` y `PUT /api/reclamos/{id}/estado` requieren rol administrativo.
+- `GET /api/noticias` y `GET /api/noticias/{slug}` son públicos; crear, modificar y eliminar noticias requiere rol administrativo.
 
 ## Pruebas
 
-Desde PowerShell, en la carpeta del proyecto:
+Ejecuta la suite con H2 en memoria:
 
 ```powershell
 .\backend\mvnw.cmd -f .\backend\pom.xml test
 ```
+
+Las pruebas no necesitan una instancia MySQL. Para validar conexión, credenciales, permisos y compatibilidad del esquema real, inicia la aplicación contra la base configurada.
+
+## Despliegue
+
+El [`Dockerfile`](Dockerfile) compila el backend y empaqueta los recursos de `frontend/`. En Render configura `SPRING_PROFILES_ACTIVE=cloud`, `PORT`, `MYSQL_ADDON_HOST`, `MYSQL_ADDON_PORT`, `MYSQL_ADDON_DB`, `MYSQL_ADDON_USER`, `MYSQL_ADDON_PASSWORD` y `SESSION_COOKIE_SECURE=true`. Mantén `FRONTEND_ORIGINS` vacío cuando el frontend se sirva desde el mismo origen; si está separado, configura solo el origen HTTPS exacto. Si frontend y API están en sitios distintos, configura además `SESSION_COOKIE_SAME_SITE=None`; en el despliegue habitual bajo el mismo sitio se conserva `lax`.
+
+Las imágenes subidas se guardan en `uploads/`. El disco del contenedor puede ser temporal, por lo que una reinicialización puede borrar esos archivos; usa almacenamiento persistente si deben conservarse.

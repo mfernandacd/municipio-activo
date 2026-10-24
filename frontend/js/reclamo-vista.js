@@ -4,12 +4,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnRefrescar = document.getElementById('btnRefrescar');
     const greetingEl = document.getElementById('adminUserGreeting');
     const btnCerrarSesion = document.getElementById('btnCerrarSesion');
-    const apiBaseUrlInput = document.querySelector('meta[name="municipio-api-base-url"]');
 
     if (!tbody || !tabla || !btnRefrescar) return;
 
     try {
-        const response = await fetch(resolverApiUrl('/api/auth/session'), {
+        const response = await window.municipioFetch(resolverApiUrl('/api/auth/session'), {
             credentials: 'include'
         });
 
@@ -29,6 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             window.location.href = 'index.html';
             return;
         }
+
+        document.querySelectorAll('[data-admin-only]').forEach((element) => {
+            element.hidden = false;
+        });
 
         if (greetingEl) {
             greetingEl.textContent = `Administrativo: ${usuario.nombre || usuario.email}`;
@@ -52,7 +55,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         mostrarMensaje('Cargando reclamos...', 'text-muted');
 
         try {
-            const response = await fetch(resolverApiUrl('/api/reclamos'), {
+            const response = await window.municipioFetch(resolverApiUrl('/api/reclamos'), {
                 method: 'GET',
                 credentials: 'include',
                 headers: { Accept: 'application/json' }
@@ -91,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const estado = normalizarEstado(reclamo.estado);
 
             const id = document.createElement('td');
-            id.className = 'text-center fw-bold text-secondary';
+            id.className = 'text-center fw-bold text-primary';
             id.textContent = `#${reclamo.id ?? '—'}`;
 
             const categoria = document.createElement('td');
@@ -163,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         controles.forEach((control) => { control.disabled = true; });
 
         try {
-            const response = await fetch(resolverApiUrl(`/api/reclamos/${encodeURIComponent(id)}/estado`), {
+            const response = await window.municipioFetch(resolverApiUrl(`/api/reclamos/${encodeURIComponent(id)}/estado`), {
                 method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -189,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function cerrarSesion() {
         btnCerrarSesion.disabled = true;
         try {
-            const response = await fetch(resolverApiUrl('/api/auth/logout'), {
+            const response = await window.municipioFetch(resolverApiUrl('/api/auth/logout'), {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -235,18 +238,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function resolverApiUrl(endpoint) {
-        const configuredBaseUrl = apiBaseUrlInput?.content.trim();
-        const baseUrl = configuredBaseUrl || (
-            ['localhost', '127.0.0.1'].includes(window.location.hostname)
-                ? `${window.location.protocol}//${window.location.hostname}:8080`
-                : window.location.origin
-        );
-        return new URL(endpoint, `${baseUrl.replace(/\/+$/, '')}/`).toString();
+        return window.municipioApiUrl(endpoint, 'municipio-api-base-url');
     }
 
     async function mostrarAviso(icon, title, text) {
         if (window.Swal?.fire) {
-            await window.Swal.fire({ icon, title, text, confirmButtonColor: '#123047' });
+            await window.Swal.fire({ icon, title, text, confirmButtonColor: '#0A2240' });
             return;
         }
         window.alert(`${title}: ${text}`);

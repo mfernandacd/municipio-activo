@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             headers['Content-Type'] = 'application/json';
         }
 
-        const response = await fetch(resolverApiUrl(endpoint), {
+        const response = await window.municipioFetch(resolverApiUrl(endpoint), {
             ...options,
             headers,
             credentials: 'include'
@@ -184,13 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resolverApiUrl(endpoint) {
-        const configuredBaseUrl = document.querySelector('meta[name="municipio-api-base-url"]')
-            ?.content.trim();
-        const baseUrl = configuredBaseUrl || (
-            ['localhost', '127.0.0.1'].includes(window.location.hostname)
-                ? `${window.location.protocol}//${window.location.hostname}:8080`
-                : window.location.origin
-        );
-        return new URL(endpoint, `${baseUrl.replace(/\/+$/, '')}/`).toString();
+        return window.municipioApiUrl(endpoint, 'municipio-api-base-url');
     }
 });

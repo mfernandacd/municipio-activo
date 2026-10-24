@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,11 @@ public class AuthController {
     public AuthController(UsuarioRepository usuarioRepository, PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    @GetMapping("/csrf")
+    public CsrfToken csrfToken(CsrfToken csrfToken) {
+        return csrfToken;
     }
 
     @GetMapping("/session")
@@ -63,7 +69,7 @@ public class AuthController {
     private void actualizarAutoridades(
             Authentication authentication,
             Usuario usuario) {
-        // Mantiene los permisos de la sesiÃ³n alineados con el rol actual que recibe el frontend.
+        // Mantiene los permisos de la sesión alineados con el rol actual que recibe el frontend.
         String authority = "ROLE_" + usuario.getRol().toUpperCase(Locale.ROOT);
         boolean tieneRolActual = authentication.getAuthorities().size() == 1
                 && authentication.getAuthorities().stream()
@@ -98,8 +104,8 @@ public class AuthController {
             @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse) {
-        if (request.email() == null || request.password() == null
-                || !request.password().matches("[A-Za-z0-9]{6,8}")) {
+        if (request == null || request.email() == null || request.email().trim().length() > 150
+                || !PasswordPolicy.canAuthenticate(request.password())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("mensaje", "Credenciales invalidas"));
         }
@@ -110,14 +116,22 @@ public class AuthController {
         return usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(email)
                 .filter(usuario -> passwordEncoder.matches(password, usuario.getPasswordHash()))
                 .map(usuario -> {
+                    if (passwordEncoder.upgradeEncoding(usuario.getPasswordHash())) {
+                        usuario.setPasswordHash(passwordEncoder.encode(password));
+                        usuarioRepository.save(usuario);
+                    }
+
                     List<GrantedAuthority> authorities = List.of(
-                            new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toUpperCase()));
+                            new SimpleGrantedAuthority("ROLE_" + usuario.getRol().toUpperCase(Locale.ROOT)));
                     UsernamePasswordAuthenticationToken authentication =
                             UsernamePasswordAuthenticationToken.authenticated(
                                     usuario.getEmail(), null, authorities);
 
                     SecurityContext context = SecurityContextHolder.createEmptyContext();
                     context.setAuthentication(authentication);
+                    if (httpRequest.getSession(false) != null) {
+                        httpRequest.changeSessionId();
+                    }
                     SecurityContextHolder.setContext(context);
                     new HttpSessionSecurityContextRepository().saveContext(context, httpRequest, httpResponse);
 
@@ -126,7 +140,7 @@ public class AuthController {
                             "nombre", usuario.getNombre(),
                             "email", usuario.getEmail(),
                             "rol", usuario.getRol(),
-                            "privilegios", usuario.getPrivilegios()));
+                            "privilegios", usuario.getPrivilegios() == null ? "" : usuario.getPrivilegios()));
                 })
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                         .body(Map.of("mensaje", "Credenciales invalidas")));
@@ -134,6 +148,9 @@ public class AuthController {
 
     @PostMapping("/registro")
     public ResponseEntity<?> registrarUsuario(@RequestBody RegistroRequest request) {
+        if (request == null) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "Faltan datos requeridos"));
+        }
         String email = request.email() == null ? "" : request.email().trim();
         String password = request.password() == null ? "" : request.password();
         String nombre = request.nombre() == null ? "" : request.nombre().trim();
@@ -142,13 +159,17 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("mensaje", "Faltan datos requeridos"));
         }
 
-        if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+        if (email.length() > 150 || !email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
             return ResponseEntity.badRequest().body(Map.of("mensaje", "Correo inválido"));
         }
 
-        if (!password.matches("[A-Za-z0-9]{6,8}")) {
+        if (nombre.length() > 120) {
+            return ResponseEntity.badRequest().body(Map.of("mensaje", "El nombre no debe superar los 120 caracteres"));
+        }
+
+        if (!PasswordPolicy.canRegister(password)) {
             return ResponseEntity.badRequest()
-                    .body(Map.of("mensaje", "La contraseña debe tener de 6 a 8 letras o números, sin caracteres especiales"));
+                    .body(Map.of("mensaje", "La nueva contraseña debe tener al menos 12 caracteres y no superar 72 bytes"));
         }
 
         email = email.toLowerCase(Locale.ROOT);

@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function cargarNoticias() {
-        const response = await fetch(resolverApiUrl('/api/noticias'));
+        const response = await window.municipioFetch(resolverApiUrl('/api/noticias'));
         if (!response.ok) {
             throw new Error(`La API respondió con el error ${response.status}.`);
         }
@@ -139,13 +139,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resolverApiUrl(endpoint) {
-        const configuredBaseUrl = document.querySelector('meta[name="municipio-api-base-url"]')
-            ?.content.trim();
-        const baseUrl = configuredBaseUrl || (
-            ['localhost', '127.0.0.1'].includes(window.location.hostname)
-                ? `${window.location.protocol}//${window.location.hostname}:8080`
-                : window.location.origin
-        );
-        return new URL(endpoint, `${baseUrl.replace(/\/+$/, '')}/`).toString();
+        return window.municipioApiUrl(endpoint, 'municipio-api-base-url');
     }
 });

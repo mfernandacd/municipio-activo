@@ -2,10 +2,10 @@ package com.municipioactivo.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 
 
-
-@SpringBootApplication
+@SpringBootApplication(exclude = UserDetailsServiceAutoConfiguration.class)
 // Punto de entrada que inicia la aplicación Spring Boot del backend.
 public class BackendApplication {
 

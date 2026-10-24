@@ -2,19 +2,20 @@ package com.municipioactivo.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 class ReclamoControllerTests {
 
@@ -73,15 +74,16 @@ class ReclamoControllerTests {
 
     @Test
     void rejectsUnsupportedImageTypesBeforeSavingTheClaim() throws Exception {
-        var response = controller.crearReclamo(
-                new ReclamoController.ReclamoRequest(
-                        "Bacheo",
-                        "Calle Belgrano 450",
-                        "",
-                        "Hay un bache que dificulta el paso."),
-                new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1}));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> controller.crearReclamo(
+                        new ReclamoController.ReclamoRequest(
+                                "Bacheo",
+                                "Calle Belgrano 450",
+                                "",
+                                "Hay un bache que dificulta el paso."),
+                        new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1})));
 
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verify(reclamoService, never()).guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class));
     }
 
@@ -89,13 +91,14 @@ class ReclamoControllerTests {
     void updatesClaimWithSupportedState() {
         Reclamo reclamo = new Reclamo("Bacheo", "Calle Belgrano 450", "", "Hay un bache que dificulta el paso.", "");
         reclamo.setId(12L);
-        when(reclamoService.obtenerTodosLosReclamos()).thenReturn(List.of(reclamo));
+        when(reclamoService.buscarPorId(12L)).thenReturn(Optional.of(reclamo));
         when(reclamoService.guardarReclamo(any(Reclamo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("en_proceso"));
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("EN_PROCESO", response.getBody().getEstado());
+        verify(reclamoService).buscarPorId(12L);
         verify(reclamoService).guardarReclamo(reclamo);
     }
 
@@ -104,7 +107,7 @@ class ReclamoControllerTests {
         var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("CANCELADO"));
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        verify(reclamoService, never()).obtenerTodosLosReclamos();
+        verify(reclamoService, never()).buscarPorId(any());
         verify(reclamoService, never()).guardarReclamo(any(Reclamo.class));
     }
 
@@ -131,7 +134,7 @@ class ReclamoControllerTests {
 
     @Test
     void returnsNotFoundWhenClaimDoesNotExist() {
-        when(reclamoService.obtenerTodosLosReclamos()).thenReturn(List.of());
+        when(reclamoService.buscarPorId(12L)).thenReturn(Optional.empty());
 
         var response = controller.actualizarEstadoReclamo(12L, new ReclamoController.EstadoRequest("RESUELTO"));
 

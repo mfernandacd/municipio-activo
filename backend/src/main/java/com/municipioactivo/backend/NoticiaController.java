@@ -2,7 +2,6 @@ package com.municipioactivo.backend;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -84,6 +83,9 @@ public class NoticiaController {
     }
 
     private NoticiaResponse updateNoticia(String slug, NoticiaRequest request, MultipartFile imageFile) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faltan los datos de la noticia.");
+        }
         Noticia noticia = findEntity(slug);
         boolean wasFeatured = noticia.isFeatured();
         Path uploadedFile = null;
@@ -126,6 +128,9 @@ public class NoticiaController {
     }
 
     private NoticiaResponse createNoticia(NoticiaRequest request, MultipartFile imageFile) {
+        if (request == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Faltan los datos de la noticia.");
+        }
         Path uploadedFile = null;
         try {
             Noticia noticia = new Noticia();
@@ -148,12 +153,7 @@ public class NoticiaController {
     }
 
     private Path storeImage(MultipartFile imageFile) {
-        if (imageFile.getSize() > 5L * 1024 * 1024) {
-            throw new ResponseStatusException(HttpStatus.CONTENT_TOO_LARGE,
-                    "La imagen no puede superar los 5 MB.");
-        }
-
-        String extension = imageExtension(imageFile);
+        String extension = ImageFileValidator.validateAndGetExtension(imageFile);
         Path uploadDirectory = Paths.get("uploads").toAbsolutePath().normalize();
         Path destination = uploadDirectory.resolve(UUID.randomUUID() + extension).normalize();
         if (!destination.startsWith(uploadDirectory)) {
@@ -174,57 +174,6 @@ public class NoticiaController {
             deleteUploadedFile(destination, exception);
             throw exception;
         }
-    }
-
-    private String imageExtension(MultipartFile imageFile) {
-        String contentType = imageFile.getContentType();
-        String extension = contentType == null ? null : switch (contentType.toLowerCase(Locale.ROOT)) {
-            case "image/jpeg" -> ".jpg";
-            case "image/png" -> ".png";
-            case "image/gif" -> ".gif";
-            case "image/webp" -> ".webp";
-            default -> null;
-        };
-        if (extension == null || !hasValidImageSignature(imageFile, extension)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El archivo debe ser una imagen JPG, PNG, GIF o WebP válida.");
-        }
-        return extension;
-    }
-
-    private boolean hasValidImageSignature(MultipartFile imageFile, String extension) {
-        try (InputStream input = imageFile.getInputStream()) {
-            byte[] header = input.readNBytes(12);
-            return switch (extension) {
-                case ".jpg" -> startsWith(header, (byte) 0xff, (byte) 0xd8, (byte) 0xff);
-                case ".png" -> startsWith(header,
-                        (byte) 0x89, (byte) 0x50, (byte) 0x4e, (byte) 0x47,
-                        (byte) 0x0d, (byte) 0x0a, (byte) 0x1a, (byte) 0x0a);
-                case ".gif" -> asciiAt(header, 0, "GIF87a") || asciiAt(header, 0, "GIF89a");
-                case ".webp" -> asciiAt(header, 0, "RIFF") && asciiAt(header, 8, "WEBP");
-                default -> false;
-            };
-        } catch (IOException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "No se pudo leer el archivo de imagen.", exception);
-        }
-    }
-
-    private boolean startsWith(byte[] value, byte... prefix) {
-        if (value.length < prefix.length) return false;
-        for (int index = 0; index < prefix.length; index++) {
-            if (value[index] != prefix[index]) return false;
-        }
-        return true;
-    }
-
-    private boolean asciiAt(byte[] value, int offset, String expected) {
-        byte[] bytes = expected.getBytes(StandardCharsets.US_ASCII);
-        if (value.length < offset + bytes.length) return false;
-        for (int index = 0; index < bytes.length; index++) {
-            if (value[offset + index] != bytes[index]) return false;
-        }
-        return true;
     }
 
     private void updateFeaturedStatus(Noticia noticia, boolean featured, boolean wasFeatured) {
@@ -313,7 +262,8 @@ public class NoticiaController {
         static NoticiaResponse from(Noticia noticia) {
             return new NoticiaResponse(noticia.getSlug(), noticia.getCategory(), noticia.getTitle(),
                     noticia.getSummary(), noticia.getContent(), normalizeImagePath(noticia.getImage()),
-                    noticia.getImageAlt(),
+                    noticia.getImageAlt() == null || noticia.getImageAlt().isBlank()
+                            ? noticia.getTitle() : noticia.getImageAlt(),
                     noticia.isFeatured());
         }
     }

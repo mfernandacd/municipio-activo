@@ -26,11 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
         select.disabled = true;
 
         // Petición HTTP PUT al servidor
-        const response = await fetch(`/api/reclamos/${claimId}/estado`, {
+        const endpoint = window.municipioApiUrl(`/api/reclamos/${claimId}/estado`);
+        const response = await window.municipioFetch(endpoint, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            // 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') // Descomentar si tu framework lo requiere
           },
           body: JSON.stringify({ estado: newStatus })
         });

@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const registroNombreInput = document.getElementById('registroNombre');
     const registroEmailInput = document.getElementById('registroEmail');
     const registroPasswordInput = document.getElementById('registroPassword');
-    const apiBaseUrlInput = document.querySelector('meta[name="municipio-api-base-url"]');
 
     const correoRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const mensajeAcceso = sessionStorage.getItem('mensajeAccesoLogin');
@@ -17,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'warning',
             title: 'Acceso requerido',
             text: mensajeAcceso,
-            confirmButtonColor: '#0d6efd'
+            confirmButtonColor: '#0A2240'
         });
     }
 
@@ -64,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!emailValido || !passwordValida) {
             await mostrarError(
                 'Datos incorrectos',
-                'Verificá el correo y usá una contraseña de 6 a 8 letras o números, sin caracteres especiales.'
+                'Verificá que el correo y la contraseña de tu cuenta sean válidos.'
             );
             return;
         }
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         actualizarEstadoValidacion(registroEmailInput, (value) => correoRegex.test(value));
     });
     registroPasswordInput.addEventListener('input', () => {
-        actualizarEstadoValidacion(registroPasswordInput, esContrasenaValida);
+        actualizarEstadoValidacion(registroPasswordInput, esNuevaContrasenaValida);
     });
 
     registroForm.addEventListener('submit', async (event) => {
@@ -109,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const password = registroPasswordInput.value;
         const nombreValido = nombre.length > 0 && nombre.length <= 120;
         const emailValido = correoRegex.test(email);
-        const passwordValida = esContrasenaValida(password);
+        const passwordValida = esNuevaContrasenaValida(password);
 
         setFieldState(registroNombreInput, nombreValido);
         setFieldState(registroEmailInput, emailValido);
@@ -118,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!nombreValido || !emailValido || !passwordValida) {
             await mostrarError(
                 'No se pudo registrar',
-                'Completá los datos correctamente. La contraseña debe tener 6 a 8 letras o números, sin caracteres especiales.'
+                'Completá los datos correctamente. La nueva contraseña debe tener al menos 12 caracteres y no superar 72 bytes.'
             );
             return;
         }
@@ -138,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon: 'success',
                 title: 'Usuario creado',
                 text: 'La cuenta se creó correctamente. Iniciando sesión...',
-                confirmButtonColor: '#0d6efd'
+                confirmButtonColor: '#0A2240'
             });
             loginForm.requestSubmit();
         } catch (error) {
@@ -147,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function llamarApi(endpoint, body) {
-        const response = await fetch(resolverApiUrl(endpoint), {
+        const response = await window.municipioFetch(resolverApiUrl(endpoint), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -171,34 +170,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resolverApiUrl(endpoint) {
-        if (window.location.protocol === 'file:') {
-            throw new Error(
-                'No abras esta página como archivo local. Iniciá Apache y el backend, y entrá desde http://localhost/municipio-activo/frontend/login.html.'
-            );
-        }
-
-        const configuredBaseUrl = apiBaseUrlInput?.content.trim();
-        if (configuredBaseUrl) {
-            let configuredUrl;
-            try {
-                configuredUrl = new URL(configuredBaseUrl);
-            } catch {
-                throw new Error('La URL configurada del backend no es válida.');
-            }
-            if (!['http:', 'https:'].includes(configuredUrl.protocol)) {
-                throw new Error('La URL del backend debe comenzar con http:// o https://.');
-            }
-            return new URL(endpoint, `${configuredUrl.toString().replace(/\/+$/, '')}/`).toString();
-        }
-
-        const backendUrl = ['localhost', '127.0.0.1'].includes(window.location.hostname)
-            ? `${window.location.protocol}//${window.location.hostname}:8080`
-            : window.location.origin;
-        return new URL(endpoint, `${backendUrl}/`).toString();
+        return window.municipioApiUrl(endpoint, 'municipio-api-base-url');
     }
 
     function esContrasenaValida(password) {
-        return /^[A-Za-z0-9]{6,8}$/.test(password);
+        return password.length >= 6
+            && new TextEncoder().encode(password).length <= 72
+            && !/[\u0000-\u001f\u007f]/.test(password);
+    }
+
+    function esNuevaContrasenaValida(password) {
+        return password.length >= 12 && esContrasenaValida(password);
     }
 
     function normalizarPrivilegios(privilegios) {
@@ -220,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
             icon: 'error',
             title,
             text,
-            confirmButtonColor: '#0d6efd'
+            confirmButtonColor: '#0A2240'
         });
     }
 });

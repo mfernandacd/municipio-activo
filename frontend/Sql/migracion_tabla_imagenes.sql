@@ -1,6 +1,6 @@
 -- =============================================================================
 -- SCRIPT DE MIGRACIÓN: Creación de tabla `imagenes` y mejoras sobre BD existente
--- Base de datos: `bziotj8qzahsjnnfoacp` / municipio-activo
+-- Base de datos: la configurada para la aplicación (Render / Clever Cloud).
 -- Este script NO borra datos existentes; actualiza tipos, añade índices y crea
 -- la tabla `imagenes` migrando las imágenes actuales de las noticias.
 -- =============================================================================

@@ -2,10 +2,11 @@ package com.municipioactivo.backend;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-interface NoticiaRepository extends JpaRepository<Noticia, Long> {
+public interface NoticiaRepository extends JpaRepository<Noticia, Long> {
     Optional<Noticia> findBySlug(String slug);
 
     boolean existsBySlug(String slug);
@@ -13,4 +14,6 @@ interface NoticiaRepository extends JpaRepository<Noticia, Long> {
     List<Noticia> findAllByOrderByCreatedAtDesc();
 
     List<Noticia> findAllByFeaturedTrue();
+
+    boolean existsByImageIn(Collection<String> images);
 }
