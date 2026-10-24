@@ -16,6 +16,7 @@ import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,16 +34,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class ReclamoController {
 
     private final ReclamoService reclamoService;
+    private final EmailService emailService;
 
-    public ReclamoController(ReclamoService reclamoService) {
+    public ReclamoController(ReclamoService reclamoService, EmailService emailService) {
         this.reclamoService = reclamoService;
+        this.emailService = emailService;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // Guarda un reclamo y, si se recibe, valida y almacena su imagen adjunta.
-    public ResponseEntity<Reclamo> crearReclamo(
+    public ResponseEntity<ReclamoCreadoResponse> crearReclamo(
             @Valid @RequestPart("reclamo") ReclamoRequest request,
-            @RequestPart(value = "imagen", required = false) MultipartFile imagen) throws IOException {
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen,
+            Authentication authentication) throws IOException {
         Reclamo reclamo = new Reclamo(
                 request.categoria(),
                 request.direccion(),
@@ -70,14 +74,22 @@ public class ReclamoController {
             reclamo.setImagenPath(uploadedFile.toString());
         }
 
+        Reclamo reclamoGuardado;
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(reclamoService.guardarReclamo(reclamo));
+            reclamoGuardado = reclamoService.guardarReclamo(reclamo);
         } catch (RuntimeException exception) {
             if (uploadedFile != null) {
                 eliminarArchivoSubido(uploadedFile, exception);
             }
             throw exception;
         }
+
+        boolean correoEnviado = emailService.enviarConfirmacionReclamo(
+                authentication.getName(),
+                reclamoGuardado.getCodigoSeguimiento());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ReclamoCreadoResponse(
+                reclamoGuardado.getCodigoSeguimiento(),
+                correoEnviado));
     }
 
     @GetMapping
@@ -142,6 +154,9 @@ public class ReclamoController {
     }
 
     public record EstadoRequest(@NotBlank String estado) {
+    }
+
+    public record ReclamoCreadoResponse(String codigoSeguimiento, boolean correoEnviado) {
     }
 
     public record SeguimientoResponse(

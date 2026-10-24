@@ -28,6 +28,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const googleMapsUrl = googleMapsInput?.value.trim() ?? '';
         const descripcion = descripcionInput?.value.trim() ?? '';
         const imagen = imagenInput?.files?.[0];
+        const usuario = await window.municipioSessionReady;
+
+        if (!usuario?.email) {
+            await mostrarError(
+                'No se pudo identificar tu cuenta',
+                'Iniciá sesión nuevamente antes de enviar el reclamo.'
+            );
+            return;
+        }
 
         if (!categoria) {
             await mostrarError('Categoría requerida', 'Seleccioná una categoría para tu reclamo.', 'warning');
@@ -103,6 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch(new URL('api/reclamos', `${baseUrl}/`), {
                 method: 'POST',
+                credentials: 'include',
                 body: formData
             });
             const responseBody = await response.text();
@@ -119,6 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    throw new Error('Tu sesión venció. Iniciá sesión nuevamente para enviar el reclamo.');
+                }
                 const errorBody = reclamoRegistrado && typeof reclamoRegistrado === 'object'
                     ? reclamoRegistrado
                     : {};
@@ -133,12 +146,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('El servidor devolvió una respuesta inválida.');
             }
 
+            const mensajeExito = reclamoRegistrado.codigoSeguimiento
+                ? `Guardamos tu solicitud. Código de seguimiento: ${reclamoRegistrado.codigoSeguimiento}.`
+                : 'Tu solicitud se guardó correctamente.';
+            const mensajeCorreo = reclamoRegistrado.correoEnviado
+                ? ' Enviamos una confirmación al correo asociado a tu cuenta.'
+                : ' No pudimos enviar el correo de confirmación; guardá el código para consultar el estado.';
+
             await Swal.fire({
                 icon: 'success',
                 title: '¡Reclamo registrado!',
-                text: reclamoRegistrado.codigoSeguimiento
-                    ? `Guardamos tu solicitud. Código de seguimiento: ${reclamoRegistrado.codigoSeguimiento}.`
-                    : 'Tu solicitud se guardó correctamente.',
+                text: mensajeExito + mensajeCorreo,
                 confirmButtonColor: '#0C2136'
             });
             formReclamo.reset();

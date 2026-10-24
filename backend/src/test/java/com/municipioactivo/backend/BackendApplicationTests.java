@@ -87,9 +87,13 @@ class BackendApplicationTests {
 				.header("Content-Type", "application/json")
 				.PUT(HttpRequest.BodyPublishers.ofString("{\"estado\":\"RESUELTO\"}"))
 				.build();
+		var createRequest = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/reclamos"))
+				.POST(HttpRequest.BodyPublishers.noBody())
+				.build();
 
 		assertEquals(403, client.send(readRequest, HttpResponse.BodyHandlers.ofString()).statusCode());
 		assertEquals(403, client.send(updateRequest, HttpResponse.BodyHandlers.ofString()).statusCode());
+		assertEquals(403, client.send(createRequest, HttpResponse.BodyHandlers.ofString()).statusCode());
 	}
 
 	@Test

@@ -23,7 +23,9 @@ Render Free duerme el sitio después de 15 minutos sin visitas. La primera visit
 
 Render despliega el proyecto desde el repositorio conectado en GitHub y utiliza el [`Dockerfile`](Dockerfile) de la raíz. Para actualizar el sitio, guarda y sube los cambios a la rama que Render tiene configurada; Render inicia un nuevo despliegue. En la configuración privada de Render, mantén `SPRING_PROFILES_ACTIVE=cloud`, `SESSION_COOKIE_SECURE=true` y las variables `MYSQL_ADDON_HOST`, `MYSQL_ADDON_PORT`, `MYSQL_ADDON_DB`, `MYSQL_ADDON_USER` y `MYSQL_ADDON_PASSWORD`.
 
-Nunca publiques la contraseña de MySQL en GitHub, en el frontend ni en este archivo. Si se comparte accidentalmente, cámbiala en Clever Cloud y actualiza el valor privado en Render.
+Para enviar confirmaciones de reclamos, configura también `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD` y, si el proveedor lo requiere, `MAIL_FROM`, `MAIL_SMTP_AUTH` y `MAIL_SMTP_STARTTLS` como variables privadas del servicio. El backend envía el código de seguimiento al correo asociado a la cuenta iniciada; no verifica que la persona pueda acceder a esa dirección y no incluye la descripción del reclamo. Si el correo no está configurado o el envío falla, el reclamo se guarda igualmente y el sitio informa que no se pudo enviar la confirmación. Para desarrollo local se pueden definir las mismas variables en el entorno antes de iniciar el backend.
+
+Nunca publiques credenciales de MySQL o SMTP en GitHub, en el frontend ni en este archivo. Si se comparten accidentalmente, cámbialas en sus proveedores y actualiza los valores privados en Render.
 
 ## Desarrollo local (opcional)
 
