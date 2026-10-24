@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const cuerpo = new FormData();
-            cuerpo.append('noticia', new Blob([JSON.stringify(noticia)], { type: 'application/json' }));
+            cuerpo.append('noticia', new Blob([JSON.stringify(noticia)], { type: 'application/json' }), 'noticia.json');
             if (archivoImagen instanceof File && archivoImagen.size > 0) {
                 cuerpo.append('imageFile', archivoImagen);
             }
@@ -162,7 +162,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.status === 204) return null;
         const body = await response.json().catch(() => ({}));
         if (!response.ok) {
-            throw new Error(body.mensaje || `La API respondió con el error ${response.status}.`);
+            let errorMsg = body.mensaje;
+            if (!errorMsg) {
+                if (response.status === 403) {
+                    errorMsg = 'Acceso denegado (Error 403). Tu sesión puede haber expirado o el servidor rechazó el origen de la petición. Cerrá sesión y volvé a ingresar.';
+                } else if (response.status === 401) {
+                    errorMsg = 'Sesión requerida (Error 401). Iniciá sesión con una cuenta administrativa.';
+                } else {
+                    errorMsg = `La API respondió con el error ${response.status}.`;
+                }
+            }
+            throw new Error(errorMsg);
         }
         return body;
     }
