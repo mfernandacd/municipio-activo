@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de reclamos - Municipio Serranoble</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="Css/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Municipio Serranoble</a>
+                <a class="btn btn-outline-light ms-auto" href="index.html#tramites">Volver a trámites</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-5">
+        <div class="row justify-content-center">
+            <section class="col-lg-8" aria-labelledby="titulo-seguimiento">
+                <h1 id="titulo-seguimiento" class="fw-bold text-primary mb-3">Seguimiento de reclamo</h1>
+                <p class="text-muted">Ingresá el código que recibiste al registrar tu reclamo para consultar su estado.</p>
+
+                <form id="tracking-form" class="row g-3">
+                    <div class="col-md-8">
+                        <label for="codigo-seguimiento" class="form-label">Código de seguimiento</label>
+                        <input
+                            type="text"
+                            id="codigo-seguimiento"
+                            class="form-control"
+                            placeholder="Ej. ABC123DEF456"
+                            autocomplete="off"
+                            required>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" id="btn-consultar" class="btn btn-primary w-100">Consultar</button>
+                    </div>
+                </form>
+
+                <div id="loading-indicator" class="d-none text-muted mt-3" role="status">
+                    <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                    Consultando el estado...
+                </div>
+                <div id="error-message" class="alert alert-warning d-none mt-3" role="alert"></div>
+
+                <section id="result-card" class="card d-none mt-4 shadow-sm" aria-labelledby="titulo-resultado">
+                    <div class="card-body">
+                        <h2 id="titulo-resultado" class="h5 card-title mb-3">Estado del reclamo</h2>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Código de seguimiento</dt>
+                            <dd class="col-sm-8" id="res-id"></dd>
+                            <dt class="col-sm-4">Categoría</dt>
+                            <dd class="col-sm-8" id="res-categoria"></dd>
+                            <dt class="col-sm-4">Estado actual</dt>
+                            <dd class="col-sm-8"><span id="res-estado" class="badge"></span></dd>
+                            <dt class="col-sm-4">Fecha de registro</dt>
+                            <dd class="col-sm-8 mb-0" id="res-fecha"></dd>
+                        </dl>
+                    </div>
+                </section>
+            </section>
+        </div>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-3 mt-auto">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Municipio Serranoble - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script src="js/logica_de_consultas_y_renderizado.js"></script>
+</body>
+</html>
