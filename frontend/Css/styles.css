@@ -312,6 +312,7 @@ footer p {
     height: 55px;
     border-radius: 50%;
     background-color: var(--color-primary);
+    color: #fff;
     border: 2px solid var(--color-secondary);
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
     z-index: 9999;
