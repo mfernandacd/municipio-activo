@@ -49,6 +49,7 @@
             'noticias.html': 'noticias',
             'noticia-detalle.html': 'noticias',
             'reclamos-municipal.html': 'tramites',
+            'reclamo_y_notificacion_mas_correo.html': 'tramites',
             'vista-reclamo.html': 'gestionar-reclamos',
             'administrar-noticias.html': 'administrar-noticias'
         };

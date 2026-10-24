@@ -50,6 +50,28 @@ class ReclamoControllerTests {
     }
 
     @Test
+    void createsNewPendingClaimFromJson() {
+        when(reclamoService.guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        var response = controller.crearReclamoJson(
+                new ReclamoController.ReclamoJsonRequest(
+                        "Alumbrado y Luminarias Serranas",
+                        "Calle Los Cerros esquina Camino del Sol",
+                        "",
+                        "Falta de iluminación pública en la esquina.",
+                        "",
+                        "Roberto Soria",
+                        "roberto.soria@ejemplo.com"));
+
+        Reclamo savedClaim = response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("PENDIENTE", savedClaim.getEstado());
+        assertEquals("Alumbrado y Luminarias Serranas", savedClaim.getCategoria());
+        assertEquals("Calle Los Cerros esquina Camino del Sol", savedClaim.getDireccion());
+    }
+
+    @Test
     void rejectsUnsupportedImageTypesBeforeSavingTheClaim() throws Exception {
         var response = controller.crearReclamo(
                 new ReclamoController.ReclamoRequest(

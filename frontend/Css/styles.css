@@ -1,21 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 /* ==========================================================
-    1. BASE Y VARIABLES GLOBALES
+    1. BASE Y VARIABLES GLOBALES - IDENTIDAD MUNICIPIO SERRANOBLE
     ========================================================== */
 :root {
-    --color-primary: #0d1f2d;      /* Color principal del header y navegación */
-    --color-secondary: #e5ad38;    /* Color de apoyo para elementos destacados */
-    --color-bg-light: #f8f9fa;     /* Fondo claro para secciones */
-    --color-text-dark: #1e293b;    /* Texto principal sobre fondo claro */
-    --color-accent: #8b4a26;       /* Color de acento para divisores y detalles visuales */
-    --font-family-base: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Paleta Oficial Municipio Serranoble */
+    --serranoble-navy: #0A2240;      /* Azul noche profundo del escudo */
+    --serranoble-navy-dark: #06162B; /* Azul ultra oscuro para headers */
+    --serranoble-navy-light: #16355C;/* Azul medio para bordes/acentos */
+    --serranoble-gold: #E5B83A;      /* Dorado espiga oficial */
+    --serranoble-gold-hover: #D4A426;/* Dorado para hover */
+    --serranoble-gold-light: #FFF8E1;/* Fondo crema con tinte dorado */
+    --serranoble-brown: #7C4328;     /* Café / Marrón de las montañas */
+    --serranoble-brown-light: #A35D3B;
+    --serranoble-cream: #FAF6EE;     /* Crema elegante de acentos */
+
+    --color-primary: #0A2240;        /* Color principal institucional */
+    --color-secondary: #E5B83A;      /* Color de apoyo oficial */
+    --color-bg-light: #f8f9fa;       /* Fondo claro para secciones */
+    --color-text-dark: #1e293b;      /* Texto principal sobre fondo claro */
+    --color-accent: #7C4328;         /* Acento marrón montañas */
+    --font-family-base: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-family-brand: 'Cinzel', serif;
 }
+
+.font-brand {
+    font-family: var(--font-family-brand);
+}
+
+.pulse-subtle {
+    animation: pulse-slow 3s infinite;
+}
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: #06162B;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #16355C;
+    border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #E5B83A;
+}
+
 
 body {
     font-family: var(--font-family-base);
     color: var(--color-text-dark);
     background: radial-gradient(circle, #F8FAFC 0%, #0F172A 100%);
     min-height: 100vh;
-    display: flex; /* Establece la estructura vertical de la página */
+    display: flex; /* Establece la estructura vertical de la pÃ¡gina */
     flex-direction: column; /* Mantiene el footer pegado al fondo incluso con poco contenido */
 }
 
@@ -68,7 +110,7 @@ header .navbar {
     border-right: none;
 }
 
-/* Ponemos la línea vertical solo entre los primeros elementos, excluyendo los últimos dos */
+/* Ponemos la lÃ­nea vertical solo entre los primeros elementos, excluyendo los Ãºltimos dos */
 .navbar-nav .nav-item:not(:last-child):not(:nth-last-child(2)) .nav-link {
     border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
 }
@@ -78,7 +120,7 @@ header .navbar {
 }
 
 /* ==========================================================
-   3. ESTRUCTURA PRINCIPAL Y PIE DE PÁGINA
+   3. ESTRUCTURA PRINCIPAL Y PIE DE PÃGINA
    ========================================================== */
 main {
     flex: 1; /* Hace que el contenido principal ocupe el espacio disponible y empuje el footer hacia abajo */
@@ -98,7 +140,7 @@ main {
 footer {
     background: linear-gradient(180deg, #1d232b 0%, #12181f 100%);
     font-size: 0.9rem;
-    border-top: 3px solid var(--color-accent); /* Línea superior de acento para diferenciar el pie de página */
+    border-top: 3px solid var(--color-accent); /* LÃ­nea superior de acento para diferenciar el pie de pÃ¡gina */
 }
 
 footer h5,
@@ -144,7 +186,7 @@ footer p {
     object-fit: cover;
     width: 100%;
     
-    /* Agregamos el marco negro/gris que tienen las noticias pequeñas */
+    /* Agregamos el marco negro/gris que tienen las noticias pequeÃ±as */
     background-color: #0b1728;            /* Fondo oscuro por si la imagen no cubre todo */
     border: 2px solid #1e293b;            /* Borde gris/oscuro alrededor de la imagen */
     border-bottom: 2px solid #1e293b;     /* O separador con el texto */
@@ -174,7 +216,7 @@ footer p {
 }
 
 .card-secundaria {
-    width: 280px; /* Ancho fijo para permitir el desplazamiento horizontal y mantener el diseño consistente */
+    width: 280px; /* Ancho fijo para permitir el desplazamiento horizontal y mantener el diseÃ±o consistente */
     border: 2px solid #0d6efd;
 }
 
@@ -186,13 +228,13 @@ footer p {
 /* ==========================================================
     5. TRAMITES, SERVICIOS Y DENUNCIAS
     ========================================================== */
-/* Las tarjetas de trámites reutilizan clases de Bootstrap y este bloque queda reservado para
-   ajustes específicos de la sección sin alterar el estilo base del framework. */
+/* Las tarjetas de trÃ¡mites reutilizan clases de Bootstrap y este bloque queda reservado para
+   ajustes especÃ­ficos de la secciÃ³n sin alterar el estilo base del framework. */
 
 /* ==========================================================
-    6. ACCESIBILIDAD: BOTÓN FLOTANTE Y PANEL
+    6. ACCESIBILIDAD: BOTÃ“N FLOTANTE Y PANEL
     ========================================================== */
-/* Botón visible en la esquina inferior derecha que abre el panel de accesibilidad */
+/* BotÃ³n visible en la esquina inferior derecha que abre el panel de accesibilidad */
 .btn-accesibilidad {
     position: fixed;
     bottom: 20px;
@@ -336,7 +378,7 @@ footer p {
 }
 
 .accesibilidad-seccion {
-    /* Cada bloque del panel agrupa ajustes relacionados con una categoría de accesibilidad */
+    /* Cada bloque del panel agrupa ajustes relacionados con una categorÃ­a de accesibilidad */
     margin-bottom: 12px;
     padding: 14px;
     border-radius: 10px;
@@ -350,14 +392,14 @@ footer p {
 }
 
 .accesibilidad-grid {
-    /* Distribución en dos columnas para presentar todas las opciones de ajustes de forma compacta */
+    /* DistribuciÃ³n en dos columnas para presentar todas las opciones de ajustes de forma compacta */
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
 }
 
 .control-tamano-fuente {
-    /* Fila de control para cambiar el tamaño de letra con botones rápidos */
+    /* Fila de control para cambiar el tamaÃ±o de letra con botones rÃ¡pidos */
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -408,12 +450,12 @@ footer p {
 }
 
 .accesibilidad-grid-three {
-    /* En secciones con más opciones, se usa una disposición de 3 columnas */
+    /* En secciones con mÃ¡s opciones, se usa una disposiciÃ³n de 3 columnas */
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .accesibilidad-opcion {
-    /* Cada opción del panel funciona como botón de ajuste visual */
+    /* Cada opciÃ³n del panel funciona como botÃ³n de ajuste visual */
     display: flex;
     min-height: 68px;
     flex-direction: column;
@@ -438,7 +480,7 @@ footer p {
 }
 
 .opcion-icon {
-    /* Icono pequeño dentro de cada ajuste para reforzar su significado */
+    /* Icono pequeÃ±o dentro de cada ajuste para reforzar su significado */
     display: grid;
     place-items: center;
     width: 24px;
@@ -451,7 +493,7 @@ footer p {
 }
 
 .btn-restablecer-accesibilidad {
-    /* Botón para volver a los valores visuales por defecto del sitio */
+    /* BotÃ³n para volver a los valores visuales por defecto del sitio */
     width: 100%;
     padding: 8px;
     border: 0;
@@ -467,7 +509,7 @@ footer p {
     background: #0b5ed7;
 }
 
-/* Accesibilidad: cambios de contenido para mejorar lectura y navegación */
+/* Accesibilidad: cambios de contenido para mejorar lectura y navegaciÃ³n */
 body.fuente-legible {
     font-family: Arial, sans-serif;
 }
@@ -496,7 +538,7 @@ body.fuente-negrita a {
     font-weight: 700;
 }
 
-/* Accesibilidad: ajustes de color y contraste para usuarios con baja visión */
+/* Accesibilidad: ajustes de color y contraste para usuarios con baja visiÃ³n */
 body.contraste-claro {
     background: #ffffff !important;
     color: #000000 !important;
@@ -511,7 +553,7 @@ body.ocultar-imagenes header img {
     visibility: hidden;
 }
 
-/* Accesibilidad: ayudas de lectura y orientación para focalizar contenido */
+/* Accesibilidad: ayudas de lectura y orientaciÃ³n para focalizar contenido */
 body.linea-lectura::after {
     position: fixed;
     top: calc(var(--cursor-y, 50vh) - 2px);
@@ -573,7 +615,7 @@ body.alto-contraste section {
 /* ==========================================================
    7. RESPONSIVE
    ========================================================== */
-/* Ajustes de layout para pantallas pequeñas y tablets */
+/* Ajustes de layout para pantallas pequeÃ±as y tablets */
 @media (max-width: 768px) {
     .hero {
         padding: 2rem 1rem;
@@ -601,9 +643,9 @@ body.alto-contraste section {
     border-radius: 28px;
     border: 1px solid #e2e8f0;
     
-    /* Expandimos el contenedor hacia los lados según marcaste en las flechas */
+    /* Expandimos el contenedor hacia los lados segÃºn marcaste en las flechas */
     max-width: 1350px;  /* Aumentamos de 1100px a 1350px para estirarlo a lo ancho */
-    width: 100%;        /* Hace que ocupe todo el ancho disponible hasta ese límite */
+    width: 100%;        /* Hace que ocupe todo el ancho disponible hasta ese lÃ­mite */
     margin: 0 auto 4rem auto; 
     min-height: 85vh;   
     
@@ -639,7 +681,7 @@ body.alto-contraste section {
 }
 
 .hero-title {
-    font-size: clamp(2.8rem, 4.2vw, 3.8rem); /* Letras más grandes */
+    font-size: clamp(2.8rem, 4.2vw, 3.8rem); /* Letras mÃ¡s grandes */
     font-weight: 800;
     color: #0f172a;
     line-height: 1.15;
@@ -694,7 +736,7 @@ body.alto-contraste section {
 }
 
 .hero-image-card {
-    flex: 0 0 54%; /* Un poquito más de ancho para la tarjeta */
+    flex: 0 0 54%; /* Un poquito mÃ¡s de ancho para la tarjeta */
     max-width: 54%;
     background: #0f2537;
     padding: 12px;
@@ -707,7 +749,7 @@ body.alto-contraste section {
 
 .municipio-img {
     width: 100%;
-    height: 440px; /* Aquí recupera el alto rectangular que querías */
+    height: 440px; /* AquÃ­ recupera el alto rectangular que querÃ­as */
     object-fit: cover;
     border-radius: 16px;
     display: block;
@@ -724,13 +766,13 @@ body.alto-contraste section {
 }
 
 
-/* Altura uniforme solo para las 4 imágenes secundarias de abajo */
+/* Altura uniforme solo para las 4 imÃ¡genes secundarias de abajo */
 #noticias .row-cols-md-4 .card-img-top {
     height: 180px !important;
     object-fit: cover !important;
 }
 
-/* Restablecemos la imagen principal destacada a su tamaño normal */
+/* Restablecemos la imagen principal destacada a su tamaÃ±o normal */
 #noticia-destacada-imagen {
     height: auto !important;
     max-height: 400px;

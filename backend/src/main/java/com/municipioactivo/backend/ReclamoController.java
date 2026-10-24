@@ -38,6 +38,27 @@ public class ReclamoController {
         this.reclamoService = reclamoService;
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    // Guarda un reclamo enviado como JSON directo desde el frontend web.
+    public ResponseEntity<Reclamo> crearReclamoJson(
+            @Valid @RequestBody ReclamoJsonRequest request) {
+        String direccion = request.direccion();
+        if (direccion == null || direccion.isBlank()) {
+            direccion = "Ubicación informada en descripción";
+        }
+        String googleMaps = request.googleMapsUrl() != null ? request.googleMapsUrl() : "";
+        String imagenPath = request.imagenPath() != null ? request.imagenPath() : "";
+
+        Reclamo reclamo = new Reclamo(
+                request.categoria(),
+                direccion,
+                googleMaps,
+                request.descripcion(),
+                imagenPath);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(reclamoService.guardarReclamo(reclamo));
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // Guarda un reclamo y, si se recibe, valida y almacena su imagen adjunta.
     public ResponseEntity<Reclamo> crearReclamo(
@@ -178,5 +199,27 @@ public class ReclamoController {
             @NotBlank @Size(max = 255) String direccion,
             @Size(max = 500) String googleMapsUrl,
             @NotBlank @Size(min = 15) String descripcion) {
+    }
+
+    public record ReclamoJsonRequest(
+            @NotBlank(message = "La categoría es obligatoria")
+            @Size(max = 50, message = "La categoría no debe superar los 50 caracteres")
+            String categoria,
+
+            @Size(max = 255, message = "La dirección no debe superar los 255 caracteres")
+            String direccion,
+
+            @Size(max = 500, message = "El enlace de Google Maps no debe superar los 500 caracteres")
+            String googleMapsUrl,
+
+            @NotBlank(message = "La descripción es obligatoria")
+            @Size(min = 15, message = "La descripción debe tener al menos 15 caracteres")
+            String descripcion,
+
+            @Size(max = 255, message = "La ruta de imagen no debe superar los 255 caracteres")
+            String imagenPath,
+
+            String userName,
+            String userEmail) {
     }
 }
