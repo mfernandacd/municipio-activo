@@ -1,7 +1,8 @@
 package com.municipioactivo.backend;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.mock;
@@ -13,24 +14,35 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 class ReclamoControllerTests {
 
     private ReclamoService reclamoService;
+    private EmailService emailService;
     private ReclamoController controller;
 
     @BeforeEach
     void setUp() {
         reclamoService = mock(ReclamoService.class);
-        controller = new ReclamoController(reclamoService);
+        emailService = mock(EmailService.class);
+        controller = new ReclamoController(reclamoService, emailService);
     }
 
     @Test
-    void createsNewPendingClaimFromPublicFieldsOnly() throws Exception {
+    void createsClaimAndSendsConfirmationToAuthenticatedUsersEmail() throws Exception {
         when(reclamoService.guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+                .thenAnswer(invocation -> {
+                    Reclamo saved = invocation.getArgument(0);
+                    saved.setCodigoSeguimiento("ABC123DEF456");
+                    return saved;
+                });
+        when(emailService.enviarConfirmacionReclamo("usuario@example.com", "ABC123DEF456")).thenReturn(true);
+        var authentication = UsernamePasswordAuthenticationToken.authenticated(
+                "usuario@example.com", null, List.of());
 
         var response = controller.crearReclamo(
                 new ReclamoController.ReclamoRequest(
@@ -38,15 +50,43 @@ class ReclamoControllerTests {
                         "Calle Belgrano 450",
                         "https://maps.google.com/",
                         "Hay un bache que dificulta el paso."),
-                null);
+                null,
+                authentication);
 
-        Reclamo savedClaim = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals("PENDIENTE", savedClaim.getEstado());
-        assertEquals("Bacheo", savedClaim.getCategoria());
-        assertNull(savedClaim.getId());
-        assertNull(savedClaim.getFechaCreacion());
-        assertNull(savedClaim.getCodigoSeguimiento());
+        assertEquals("ABC123DEF456", response.getBody().codigoSeguimiento());
+        assertTrue(response.getBody().correoEnviado());
+        ArgumentCaptor<Reclamo> claimCaptor = ArgumentCaptor.forClass(Reclamo.class);
+        verify(reclamoService).guardarReclamo(claimCaptor.capture());
+        assertEquals("PENDIENTE", claimCaptor.getValue().getEstado());
+        assertEquals("Bacheo", claimCaptor.getValue().getCategoria());
+        verify(emailService).enviarConfirmacionReclamo("usuario@example.com", "ABC123DEF456");
+    }
+
+    @Test
+    void keepsClaimRegisteredWhenConfirmationEmailCannotBeSent() throws Exception {
+        when(reclamoService.guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class)))
+                .thenAnswer(invocation -> {
+                    Reclamo saved = invocation.getArgument(0);
+                    saved.setCodigoSeguimiento("ABC123DEF456");
+                    return saved;
+                });
+        when(emailService.enviarConfirmacionReclamo("usuario@example.com", "ABC123DEF456")).thenReturn(false);
+        var authentication = UsernamePasswordAuthenticationToken.authenticated(
+                "usuario@example.com", null, List.of());
+
+        var response = controller.crearReclamo(
+                new ReclamoController.ReclamoRequest(
+                        "Bacheo",
+                        "Calle Belgrano 450",
+                        "",
+                        "Hay un bache que dificulta el paso."),
+                null,
+                authentication);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals("ABC123DEF456", response.getBody().codigoSeguimiento());
+        assertFalse(response.getBody().correoEnviado());
     }
 
     @Test
@@ -57,7 +97,9 @@ class ReclamoControllerTests {
                         "Calle Belgrano 450",
                         "",
                         "Hay un bache que dificulta el paso."),
-                new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1}));
+                new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1}),
+                UsernamePasswordAuthenticationToken.authenticated(
+                        "usuario@example.com", null, List.of()));
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         verify(reclamoService, never()).guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class));
