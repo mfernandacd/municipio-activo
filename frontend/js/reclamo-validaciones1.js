@@ -3,6 +3,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const submitButton = document.getElementById('submitBtn');
     const nameInput = document.getElementById('userName');
     const emailInput = document.getElementById('userEmail');
+    const barrioSelect = document.getElementById('claimNeighborhood');
+    const zonaSelect = document.getElementById('claimZone');
 
     if (!form || !submitButton || !nameInput || !emailInput) return;
 
@@ -14,6 +16,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     nameInput.readOnly = true;
     emailInput.readOnly = true;
 
+    // Lógica para autoseleccionar la zona según el barrio elegido de forma excluyente
+    if (barrioSelect && zonaSelect) {
+        barrioSelect.addEventListener('change', () => {
+            const selectedOption = barrioSelect.options[barrioSelect.selectedIndex];
+            const zonaCorrespondiente = selectedOption.getAttribute('data-zone');
+
+            if (zonaCorrespondiente) {
+                zonaSelect.value = zonaCorrespondiente;
+            }
+        });
+    }
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!form.reportValidity()) return;
@@ -21,8 +35,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const payload = {
             categoria: document.getElementById('claimCategory').value.trim(),
             direccion: document.getElementById('claimAddress').value.trim(),
-            barrio: document.getElementById('claimNeighborhood').value.trim(),
-            zona: document.getElementById('claimZone').value,
+            barrio: barrioSelect.value.trim(),
+            zona: zonaSelect.value,
             googleMapsUrl: document.getElementById('googleMapsUrl').value.trim(),
             descripcion: document.getElementById('claimDescription').value.trim()
         };

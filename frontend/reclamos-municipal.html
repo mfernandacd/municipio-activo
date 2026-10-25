@@ -28,7 +28,7 @@
             <div class="card-body p-4 p-md-5">
                 <h2 id="claim-form-title" class="h5 fw-bold mb-4">Datos del reclamo</h2>
 
-                <form id="claimForm">
+                <form id="claimForm" novalidate>
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label for="userName" class="form-label">Nombre y apellido</label>
@@ -43,7 +43,7 @@
 
                         <div class="col-12">
                             <label for="claimCategory" class="form-label">Categoría <span aria-hidden="true">*</span></label>
-                            <select id="claimCategory" class="form-select" required>
+                            <select id="claimCategory" name="categoria" class="form-select" required>
                                 <option value="" selected disabled>Seleccioná una categoría</option>
                                 <option value="Alumbrado y Luminarias Serranas">Alumbrado y luminarias</option>
                                 <option value="Mantenimiento de Calles y Asfalto">Calles y asfalto</option>
@@ -56,16 +56,13 @@
 
                         <div class="col-12">
                             <label for="claimAddress" class="form-label">Dirección <span aria-hidden="true">*</span></label>
-                            <input id="claimAddress" class="form-control" type="text" maxlength="255" autocomplete="street-address" placeholder="Calle y altura o referencia" required>
+                            <input id="claimAddress" name="direccion" class="form-control" type="text" maxlength="255" autocomplete="street-address" placeholder="Calle y altura o referencia" required>
                         </div>
 
-                        <div class="col-md-7">
-                            <label for="claimNeighborhood" class="form-label">Barrio <span aria-hidden="true">*</span></label>
-                            <input id="claimNeighborhood" class="form-control" type="text" maxlength="100" autocomplete="address-level3" placeholder="Nombre del barrio" required>
-                        </div>
-                        <div class="col-md-5">
+                        <!-- ZONA (Se asignará automáticamente o se puede seleccionar) -->
+                        <div class="col-md-6">
                             <label for="claimZone" class="form-label">Zona <span aria-hidden="true">*</span></label>
-                            <select id="claimZone" class="form-select" required>
+                            <select id="claimZone" name="zona" class="form-select" required>
                                 <option value="" selected disabled>Seleccioná una zona</option>
                                 <option value="NORTE">Norte</option>
                                 <option value="SUR">Sur</option>
@@ -76,14 +73,30 @@
                             </select>
                         </div>
 
+                        <!-- BARRIO (Al elegir uno, autocompleta/selecciona su zona) -->
+                        <div class="col-md-6">
+                            <label for="claimNeighborhood" class="form-label">Barrio <span aria-hidden="true">*</span></label>
+                            <select id="claimNeighborhood" name="barrio" class="form-select" required>
+                                <option value="" selected disabled>Seleccioná un barrio</option>
+                                <!-- Zona Centro -->
+                                <option value="Centro" data-zone="CENTRO">Centro</option>
+                                <option value="San Martín" data-zone="CENTRO">San Martín</option>
+                                <!-- Zona Norte -->
+                                <option value="Villa Belgrano" data-zone="NORTE">Villa Belgrano</option>
+                                <!-- Zona Oeste -->
+                                <option value="Los Álamos" data-zone="OESTE">Los Álamos</option>
+                                <option value="El Mirador" data-zone="OESTE">El Mirador</option>
+                            </select>
+                        </div>
+
                         <div class="col-12">
                             <label for="googleMapsUrl" class="form-label">Enlace de Google Maps <span class="text-muted">(opcional)</span></label>
-                            <input id="googleMapsUrl" class="form-control" type="url" maxlength="500" placeholder="https://maps.google.com/...">
+                            <input id="googleMapsUrl" name="googleMapsUrl" class="form-control" type="url" maxlength="500" placeholder="https://maps.google.com/...">
                         </div>
 
                         <div class="col-12">
                             <label for="claimDescription" class="form-label">Descripción del problema <span aria-hidden="true">*</span></label>
-                            <textarea id="claimDescription" class="form-control" rows="5" minlength="15" maxlength="15000" placeholder="Describí el problema y cuándo ocurre." required></textarea>
+                            <textarea id="claimDescription" name="descripcion" class="form-control" rows="5" minlength="15" maxlength="15000" placeholder="Describí el problema y cuándo ocurre." required></textarea>
                             <div class="form-text">Ingresá al menos 15 caracteres.</div>
                         </div>
 
