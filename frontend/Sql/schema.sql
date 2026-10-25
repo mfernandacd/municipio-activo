@@ -44,6 +44,8 @@ CREATE TABLE IF NOT EXISTS reclamos (
     categoria VARCHAR(50) NOT NULL,
     area_asignada VARCHAR(100) DEFAULT NULL,
     direccion VARCHAR(255) NOT NULL,
+    barrio VARCHAR(100) NOT NULL DEFAULT 'Sin especificar',
+    zona VARCHAR(20) NOT NULL DEFAULT 'Sin especificar',
     google_maps_url VARCHAR(500) DEFAULT NULL,
     descripcion TEXT NOT NULL,
     imagen_path VARCHAR(255) DEFAULT NULL,

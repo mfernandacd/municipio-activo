@@ -16,7 +16,9 @@ ALTER TABLE `usuarios`
 
 ALTER TABLE `reclamos` 
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-    ADD COLUMN IF NOT EXISTS `fecha_actualizacion` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP;
+    ADD COLUMN IF NOT EXISTS `fecha_actualizacion` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    ADD COLUMN IF NOT EXISTS `barrio` varchar(100) NOT NULL DEFAULT 'Sin especificar' AFTER `direccion`,
+    ADD COLUMN IF NOT EXISTS `zona` varchar(20) NOT NULL DEFAULT 'Sin especificar' AFTER `barrio`;
 
 ALTER TABLE `noticias` 
     CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,

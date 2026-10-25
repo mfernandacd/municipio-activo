@@ -39,11 +39,13 @@
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" id="tablaReclamos">
-                        <caption class="visually-hidden">Reclamos recibidos, su ubicación, estado y controles para actualizarlo</caption>
+                        <caption class="visually-hidden">Reclamos recibidos, barrio, zona, dirección, estado y controles para actualizarlos</caption>
                         <thead class="table-dark">
                             <tr>
                                 <th scope="col" class="text-center">ID</th>
                                 <th scope="col">Categoría</th>
+                                <th scope="col">Barrio</th>
+                                <th scope="col">Zona</th>
                                 <th scope="col">Dirección / Ubicación</th>
                                 <th scope="col" class="text-center">Estado actual</th>
                                 <th scope="col" class="text-center">Acciones</th>
@@ -52,7 +54,7 @@
                         <tbody id="tbodyReclamos" aria-live="polite" aria-busy="true">
                             <!-- Datos inyectados dinámicamente por JavaScript -->
                             <tr>
-                                <td colspan="5" class="text-center py-4 text-muted">
+                                <td colspan="7" class="text-center py-4 text-muted">
                                     <div class="spinner-border spinner-border-sm me-2 text-primary" role="status"></div>
                                     Verificando credenciales y cargando reclamos...
                                 </td>

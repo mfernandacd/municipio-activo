@@ -19,12 +19,16 @@ public class DataInitializer {
                 reclamoRepository.save(new Reclamo(
                         "Luminarias",
                         "Av. San Martin 1234, Barrio Centro",
+                        "Centro",
+                        "CENTRO",
                         "https://maps.google.com/",
                         "La luminaria de la esquina permanece apagada durante la noche.",
                         ""));
                 reclamoRepository.save(new Reclamo(
                         "Bacheo",
                         "Calle Belgrano 450, Barrio Norte",
+                        "Norte",
+                        "NORTE",
                         "",
                         "Hay un bache grande que dificulta el paso de vehiculos y peatones.",
                         ""));

@@ -11,12 +11,13 @@ import java.util.Set;
 import java.util.UUID;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,34 +44,37 @@ public class ReclamoController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     // Guarda un reclamo enviado como JSON directo desde el frontend web.
     public ResponseEntity<Reclamo> crearReclamoJson(
-            @Valid @RequestBody ReclamoJsonRequest request) {
+            @Valid @RequestBody ReclamoJsonRequest request,
+            Authentication authentication) {
         if (request == null) return ResponseEntity.badRequest().build();
 
-        String direccion = request.direccion();
-        if (direccion == null || direccion.isBlank()) {
-            direccion = "Ubicación informada en descripción";
-        }
         String googleMaps = request.googleMapsUrl() != null ? request.googleMapsUrl() : "";
         Reclamo reclamo = new Reclamo(
                 request.categoria(),
-                direccion,
+                request.direccion().trim(),
+                request.barrio().trim(),
+                request.zona().trim().toUpperCase(Locale.ROOT),
                 googleMaps,
                 request.descripcion(),
                 null);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(reclamoService.guardarReclamo(reclamo));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(reclamoService.registrarReclamo(reclamo, authentication.getName()));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // Guarda un reclamo y, si se recibe, valida y almacena su imagen adjunta.
     public ResponseEntity<Reclamo> crearReclamo(
             @Valid @RequestPart("reclamo") ReclamoRequest request,
-            @RequestPart(value = "imagen", required = false) MultipartFile imagen) throws IOException {
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen,
+            Authentication authentication) throws IOException {
         if (request == null) return ResponseEntity.badRequest().build();
 
         Reclamo reclamo = new Reclamo(
                 request.categoria(),
-                request.direccion(),
+                request.direccion().trim(),
+                request.barrio().trim(),
+                request.zona().trim().toUpperCase(Locale.ROOT),
                 request.googleMapsUrl(),
                 request.descripcion(),
                 "");
@@ -94,7 +99,8 @@ public class ReclamoController {
         }
 
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(reclamoService.guardarReclamo(reclamo));
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(reclamoService.registrarReclamo(reclamo, authentication.getName()));
         } catch (RuntimeException exception) {
             if (uploadedFile != null) {
                 eliminarArchivoSubido(uploadedFile, exception);
@@ -124,6 +130,16 @@ public class ReclamoController {
     // Devuelve los reclamos cuyo estado coincide con el parámetro recibido.
     public List<Reclamo> obtenerReclamosPorEstado(@PathVariable String estado) {
         return reclamoService.obtenerReclamosPorEstado(estado);
+    }
+
+    @GetMapping("/ubicacion")
+    public List<Reclamo> obtenerReclamosPorUbicacion(
+            @RequestParam String barrio,
+            @RequestParam String zona) {
+        if (barrio.isBlank() || zona.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El barrio y la zona son obligatorios.");
+        }
+        return reclamoService.obtenerPorBarrioYZona(barrio, zona);
     }
 
     @GetMapping("/seguimiento/{codigoSeguimiento}")
@@ -180,6 +196,8 @@ public class ReclamoController {
     public record ReclamoRequest(
             @NotBlank @Size(max = 50) String categoria,
             @NotBlank @Size(max = 255) String direccion,
+            @NotBlank @Size(max = 100) String barrio,
+            @NotBlank @Pattern(regexp = "(?i)^(NORTE|SUR|ESTE|OESTE|CENTRO|RURAL)$") String zona,
             @Size(max = 500) String googleMapsUrl,
             @NotBlank @Size(min = 15) String descripcion) {
     }
@@ -189,20 +207,23 @@ public class ReclamoController {
             @Size(max = 50, message = "La categoría no debe superar los 50 caracteres")
             String categoria,
 
+            @NotBlank(message = "La dirección es obligatoria")
             @Size(max = 255, message = "La dirección no debe superar los 255 caracteres")
             String direccion,
+
+            @NotBlank(message = "El barrio es obligatorio")
+            @Size(max = 100, message = "El barrio no debe superar los 100 caracteres")
+            String barrio,
+
+            @NotBlank(message = "La zona es obligatoria")
+            @Pattern(regexp = "(?i)^(NORTE|SUR|ESTE|OESTE|CENTRO|RURAL)$", message = "La zona seleccionada no es válida")
+            String zona,
 
             @Size(max = 500, message = "El enlace de Google Maps no debe superar los 500 caracteres")
             String googleMapsUrl,
 
             @NotBlank(message = "La descripción es obligatoria")
             @Size(min = 15, message = "La descripción debe tener al menos 15 caracteres")
-            String descripcion,
-
-            @Size(max = 255, message = "La ruta de imagen no debe superar los 255 caracteres")
-            String imagenPath,
-
-            @Size(max = 120) String userName,
-            @Email @Size(max = 150) String userEmail) {
+            String descripcion) {
     }
 }

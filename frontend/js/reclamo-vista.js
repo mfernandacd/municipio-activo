@@ -103,6 +103,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             categoriaBadge.textContent = reclamo.categoria || 'General';
             categoria.appendChild(categoriaBadge);
 
+            const barrio = document.createElement('td');
+            barrio.textContent = reclamo.barrio || 'Sin especificar';
+
+            const zona = document.createElement('td');
+            zona.textContent = reclamo.zona
+                ? `${reclamo.zona.charAt(0)}${reclamo.zona.slice(1).toLocaleLowerCase('es-AR')}`
+                : 'Sin especificar';
+
             const direccion = document.createElement('td');
             direccion.textContent = reclamo.direccion || 'Sin dirección especificada';
 
@@ -148,7 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             controles.append(selector, botonGuardar);
             acciones.appendChild(controles);
-            fila.append(id, categoria, direccion, celdaEstado, acciones);
+            fila.append(id, categoria, barrio, zona, direccion, celdaEstado, acciones);
             tbody.appendChild(fila);
         });
     }
@@ -211,7 +219,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function mostrarMensaje(mensaje, clase) {
         const fila = document.createElement('tr');
         const celda = document.createElement('td');
-        celda.colSpan = 5;
+        celda.colSpan = 7;
         celda.className = `text-center py-4 ${clase}`;
         celda.textContent = mensaje;
         fila.appendChild(celda);

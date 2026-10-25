@@ -1,357 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrar un reclamo - Municipio Serranoble</title>
-  
-  <meta name="reclamos-api-base-url" content="">
-  <meta name="municipio-api-base-url" content="">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="municipio-api-base-url" content="">
+    <title>Registrar un reclamo - Municipio Serranoble</title>
 
-  <!-- Estilos e Identidad Visual Oficial Serranoble -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="Css/styles.css">
+    <link rel="stylesheet" href="Css/reclamos-municipal.css">
 
-  <!-- Tailwind CSS CDN y configuración exteriorizada -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="js/tailwind-config.js"></script>
-
-  <!-- Font Awesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- SweetAlert2 CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-  <link rel="stylesheet" href="Css/styles.css">
+    <script src="js/reclamo-sesion.js"></script>
 </head>
-<body class="antialiased">
+<body class="claim-form-page" data-auth-required>
+    <header data-site-header></header>
 
-  <!-- Header Institucional Serranoble -->
-  <header data-site-header></header>
-
-  <!-- Banner Informativo Serranoble -->
-  <div class="bg-serranoble-navyDark text-slate-200 py-3 px-4 sm:px-6 border-b border-serranoble-navyLight">
-    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm">
-      <div class="flex items-center space-x-2">
-        <i class="fa-solid fa-circle-info text-serranoble-gold text-base flex-shrink-0"></i>
-        <span><strong>Gestión de reclamos en tiempo real:</strong> Completá el formulario. El servidor registrará tu solicitud y mostrará el código de seguimiento junto con una vista previa de confirmación.</span>
-      </div>
-      <button type="button" id="btnFillExample" class="text-serranoble-gold hover:text-white underline font-medium hover:no-underline whitespace-nowrap">
-        <i class="fa-solid fa-bolt mr-1"></i>Cargar datos de ejemplo
-      </button>
-    </div>
-  </div>
-
-  <!-- Contenido Principal Grid 2 Columnas -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-    <!-- COLUMNA IZQUIERDA: Formulario de Reclamo Ciudadano (5 Columnas) -->
-    <section class="lg:col-span-5 flex flex-col space-y-4">
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
-        <div class="bg-serranoble-goldLight border-b border-serranoble-gold/30 p-4 sm:px-6">
-          <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-pen-to-square text-serranoble-brown"></i>
-            <h2 class="font-bold text-serranoble-navy text-base">1. Formulario de Reclamo</h2>
-          </div>
-          <p class="text-xs text-slate-600 mt-1">Registrá tu inquietud para el Municipio de Serranoble.</p>
+    <main class="container claim-form-container py-5">
+        <div class="claim-form-heading text-center mb-4">
+            <p class="dashboard-eyebrow mb-2">Atención ciudadana</p>
+            <h1 class="h2 fw-bold text-primary mb-2">Registrar un reclamo</h1>
+            <p class="text-muted mb-0">Completá los datos del problema para que el municipio pueda atenderlo.</p>
         </div>
 
-        <form id="claimForm" class="p-5 sm:p-6 space-y-4 flex-1 flex flex-col justify-between" novalidate>
-          <div class="space-y-4">
-            <!-- Campo Nombre -->
-            <div>
-              <label for="userName" class="block text-xs font-semibold text-serranoble-navy uppercase tracking-wider mb-1.5">
-                Nombre y Apellido <span class="text-serranoble-brown">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fa-regular fa-user text-sm"></i>
-                </div>
-                <input type="text" id="userName" required placeholder="Ej: María Gonzáles"
-                  class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-serranoble-navy focus:border-serranoble-navy focus:bg-white transition-all outline-none">
-              </div>
+        <section class="card claim-form-card mx-auto" aria-labelledby="claim-form-title">
+            <div class="card-body p-4 p-md-5">
+                <h2 id="claim-form-title" class="h5 fw-bold mb-4">Datos del reclamo</h2>
+
+                <form id="claimForm">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="userName" class="form-label">Nombre y apellido</label>
+                            <input id="userName" class="form-control claim-readonly" type="text" autocomplete="name" readonly required aria-readonly="true">
+                            <div class="form-text">Este dato proviene de tu cuenta.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="userEmail" class="form-label">Correo electrónico</label>
+                            <input id="userEmail" class="form-control claim-readonly" type="email" autocomplete="email" readonly required aria-readonly="true">
+                            <div class="form-text">Este dato proviene de tu cuenta.</div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="claimCategory" class="form-label">Categoría <span aria-hidden="true">*</span></label>
+                            <select id="claimCategory" class="form-select" required>
+                                <option value="" selected disabled>Seleccioná una categoría</option>
+                                <option value="Alumbrado y Luminarias Serranas">Alumbrado y luminarias</option>
+                                <option value="Mantenimiento de Calles y Asfalto">Calles y asfalto</option>
+                                <option value="Poda y Espacios Verdes">Poda y espacios verdes</option>
+                                <option value="Recolección e Higiene Urbana">Recolección e higiene urbana</option>
+                                <option value="Redes de Agua y Cloacas">Agua y cloacas</option>
+                                <option value="Otros">Otros</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="claimAddress" class="form-label">Dirección <span aria-hidden="true">*</span></label>
+                            <input id="claimAddress" class="form-control" type="text" maxlength="255" autocomplete="street-address" placeholder="Calle y altura o referencia" required>
+                        </div>
+
+                        <div class="col-md-7">
+                            <label for="claimNeighborhood" class="form-label">Barrio <span aria-hidden="true">*</span></label>
+                            <input id="claimNeighborhood" class="form-control" type="text" maxlength="100" autocomplete="address-level3" placeholder="Nombre del barrio" required>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="claimZone" class="form-label">Zona <span aria-hidden="true">*</span></label>
+                            <select id="claimZone" class="form-select" required>
+                                <option value="" selected disabled>Seleccioná una zona</option>
+                                <option value="NORTE">Norte</option>
+                                <option value="SUR">Sur</option>
+                                <option value="ESTE">Este</option>
+                                <option value="OESTE">Oeste</option>
+                                <option value="CENTRO">Centro</option>
+                                <option value="RURAL">Rural</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="googleMapsUrl" class="form-label">Enlace de Google Maps <span class="text-muted">(opcional)</span></label>
+                            <input id="googleMapsUrl" class="form-control" type="url" maxlength="500" placeholder="https://maps.google.com/...">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="claimDescription" class="form-label">Descripción del problema <span aria-hidden="true">*</span></label>
+                            <textarea id="claimDescription" class="form-control" rows="5" minlength="15" maxlength="15000" placeholder="Describí el problema y cuándo ocurre." required></textarea>
+                            <div class="form-text">Ingresá al menos 15 caracteres.</div>
+                        </div>
+
+                        <div class="col-12 pt-2">
+                            <button id="submitBtn" class="btn btn-primary claim-submit-button w-100" type="submit">
+                                <i class="fa-solid fa-paper-plane me-2" aria-hidden="true"></i>Enviar reclamo
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
+        </section>
+    </main>
 
-            <!-- Campo Mail -->
-            <div>
-              <label for="userEmail" class="block text-xs font-semibold text-serranoble-navy uppercase tracking-wider mb-1.5">
-                Correo electrónico (opcional)
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fa-regular fa-envelope text-sm"></i>
-                </div>
-                <input type="email" id="userEmail" placeholder="tu-email@ejemplo.com"
-                  class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-serranoble-navy focus:border-serranoble-navy focus:bg-white transition-all outline-none">
-              </div>
-              <p class="text-[11px] text-slate-500 mt-1">Si lo ingresás, aparecerá en la vista previa. El portal no envía correos.</p>
-            </div>
+    <footer data-site-footer></footer>
 
-            <!-- Campo Categoría -->
-            <div>
-              <label for="claimCategory" class="block text-xs font-semibold text-serranoble-navy uppercase tracking-wider mb-1.5">
-                Categoría del Reclamo <span class="text-serranoble-brown">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-list-check text-sm"></i>
-                </div>
-                <select id="claimCategory" required
-                  class="w-full pl-9 pr-8 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-serranoble-navy focus:border-serranoble-navy focus:bg-white transition-all outline-none appearance-none">
-                  <option value="" disabled selected>Selecciona una categoría</option>
-                  <option value="Alumbrado y Luminarias Serranas">💡 Alumbrado y Luminarias Serranas</option>
-                  <option value="Mantenimiento de Calles y Asfalto">🚧 Mantenimiento de Calles y Asfalto</option>
-                  <option value="Poda y Espacios Verdes">🌳 Poda y Espacios Verdes</option>
-                  <option value="Recolección e Higiene Urbana">🗑️ Recolección e Higiene Urbana</option>
-                  <option value="Redes de Agua y Cloacas">💧 Redes de Agua y Cloacas</option>
-                  <option value="Otros">📋 Otros reclamos</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-chevron-down text-xs"></i>
-                </div>
-              </div>
-            </div>
-
-            <!-- Campo Dirección / Ubicación -->
-            <div>
-              <label for="claimAddress" class="block text-xs font-semibold text-serranoble-navy uppercase tracking-wider mb-1.5">
-                Dirección / Ubicación <span class="text-serranoble-brown">*</span>
-              </label>
-              <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                  <i class="fa-solid fa-location-dot text-sm"></i>
-                </div>
-                <input type="text" id="claimAddress" required placeholder="Ej: Av. San Martín 1234, Barrio Centro"
-                  class="w-full pl-9 pr-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-serranoble-navy focus:border-serranoble-navy focus:bg-white transition-all outline-none">
-              </div>
-            </div>
-
-            <!-- Campo Descripción -->
-            <div>
-              <label for="claimDescription" class="block text-xs font-semibold text-serranoble-navy uppercase tracking-wider mb-1.5">
-                Descripción del Problema <span class="text-serranoble-brown">*</span>
-              </label>
-              <textarea id="claimDescription" rows="3" required placeholder="Detalla la situación del problema (mínimo 15 caracteres)..."
-                class="w-full p-3 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-serranoble-navy focus:border-serranoble-navy focus:bg-white transition-all outline-none resize-none"></textarea>
-            </div>
-          </div>
-
-          <!-- Botones de Acción -->
-          <div class="pt-4 border-t border-slate-100 mt-4 space-y-2">
-            <button type="submit" id="submitBtn"
-              class="w-full bg-serranoble-navy hover:bg-serranoble-navyDark text-serranoble-gold font-semibold py-3 px-4 rounded-xl shadow-md border border-serranoble-gold/40 hover:shadow-lg transition-all duration-200 flex items-center justify-center space-x-2 active:scale-[0.99]">
-              <i class="fa-solid fa-paper-plane"></i>
-              <span>Enviar Reclamo a Serranoble</span>
-            </button>
-            <button type="button" id="btnResetAll"
-              class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium py-2 px-4 rounded-xl transition-all text-xs flex items-center justify-center space-x-1">
-              <i class="fa-solid fa-rotate-left"></i>
-              <span>Reiniciar Simulación</span>
-            </button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- COLUMNA DERECHA: Servidor, BD y Mailbox Simulado (7 Columnas) -->
-    <section class="lg:col-span-7 flex flex-col space-y-6">
-
-      <!-- Panel 1: Estado del Servidor y BD -->
-      <div class="bg-serranoble-navyDark rounded-2xl shadow-md border border-serranoble-navyLight text-slate-100 overflow-hidden">
-        <div class="bg-serranoble-navy px-5 py-3 border-b border-serranoble-navyLight flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <span class="flex h-2.5 w-2.5 relative">
-              <span id="serverStatusPulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-serranoble-gold opacity-75"></span>
-              <span id="serverStatusDot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-serranoble-gold"></span>
-            </span>
-            <span class="font-mono text-xs font-semibold text-serranoble-gold uppercase tracking-wider">2. Base de Datos - Municipio Serranoble</span>
-          </div>
-          <span id="serverStatusText" class="text-[11px] font-mono text-serranoble-gold bg-serranoble-navyDark px-2 py-0.5 rounded border border-serranoble-gold/30">
-            API DEL PORTAL
-          </span>
-        </div>
-
-        <div class="p-4 sm:p-5 font-mono text-xs space-y-3">
-          <!-- Indicador de Proceso -->
-          <div id="processingState" class="hidden flex items-center space-x-3 text-serranoble-gold py-2">
-            <i class="fa-solid fa-circle-notch fa-spin text-base"></i>
-            <span id="processingText">Procesando solicitud y preparando la vista previa...</span>
-          </div>
-
-          <!-- JSON de Respuesta / BD -->
-          <div>
-            <div class="text-slate-400 text-[11px] mb-1 flex items-center justify-between">
-              <span>Registro guardado en Tabla: <code class="text-serranoble-gold">reclamos</code></span>
-              <span id="codeGeneratedBadge" class="hidden text-xs bg-serranoble-gold/20 text-serranoble-gold px-2 py-0.5 rounded border border-serranoble-gold/40">
-                Código Creado
-              </span>
-            </div>
-            <pre id="jsonOutput" class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-serranoble-gold overflow-x-auto max-h-48 custom-scrollbar font-mono text-[11px] leading-relaxed">// Esperando ingreso de reclamo...
-{
-  "municipio": "Serranoble",
-  "status": "idle",
-  "message": "Ningún reclamo enviado aún."
-}</pre>
-          </div>
-        </div>
-      </div>
-
-      <!-- Panel 2: Simulador de Bandeja de Entrada de Mail -->
-      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col">
-        <!-- Header del Cliente de Correo -->
-        <div class="bg-serranoble-navy text-white px-5 py-3.5 flex items-center justify-between border-b border-serranoble-gold/30">
-          <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-inbox text-serranoble-gold"></i>
-            <h3 class="font-bold text-sm">3. Vista previa del correo de confirmación</h3>
-          </div>
-          <div class="flex items-center space-x-2 text-xs text-slate-300">
-            <span id="mailCount" class="bg-serranoble-navyDark text-serranoble-gold px-2 py-0.5 rounded-full text-[11px] border border-serranoble-gold/20">0 mensajes</span>
-          </div>
-        </div>
-
-        <!-- Estado Vacío -->
-        <div id="mailEmptyState" class="p-8 text-center flex-1 flex flex-col items-center justify-center text-slate-400">
-          <div class="w-16 h-16 rounded-full bg-serranoble-goldLight flex items-center justify-center mb-3 text-serranoble-brown text-2xl border border-serranoble-gold/30">
-            <i class="fa-regular fa-envelope-open"></i>
-          </div>
-          <p class="font-medium text-slate-700 text-sm">Sin vista previa todavía</p>
-          <p class="text-xs text-slate-500 mt-1 max-w-xs">
-            Al registrar un reclamo se mostrará aquí un ejemplo del correo de confirmación. El portal no envía correos electrónicos.
-          </p>
-        </div>
-
-        <!-- Vista Previa del Mail Recibido (Inicialmente Oculto) -->
-        <div id="mailContent" class="hidden p-4 sm:p-6 flex-1 flex flex-col space-y-4 bg-slate-50/50">
-          <!-- Encabezado del Mail -->
-          <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
-              <span class="text-xs text-slate-500 font-medium">De: <strong class="text-serranoble-navy">Municipalidad de Serranoble &lt;reclamos@serranoble.gob.ar&gt;</strong></span>
-              <span id="mailTimestamp" class="text-[11px] text-slate-400 font-mono">--:--</span>
-            </div>
-            <div class="text-xs text-slate-500 font-medium">
-              Para: <strong id="mailTo" class="text-slate-800">--</strong>
-            </div>
-            <div class="text-sm font-bold text-slate-900 pt-1">
-              Asunto: <span id="mailSubject" class="text-serranoble-brown">Confirmación de Reclamo - Código Serranoble</span>
-            </div>
-          </div>
-
-          <!-- Cuerpo del Mail Institucional Con Logo de Serranoble -->
-          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden text-slate-700 text-xs sm:text-sm">
-            <!-- Header visual del Email con los Colores de Serranoble -->
-            <div class="bg-serranoble-navy text-white p-5 flex items-center justify-between border-b-4 border-serranoble-gold">
-              <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-serranoble-navyDark p-1 rounded-lg border border-serranoble-gold/40 flex-shrink-0">
-                  <!-- SVG Serranoble en Header de Mail -->
-                  <svg viewBox="0 0 400 300" class="w-full h-full object-contain" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="400" height="300" fill="#0A2240" rx="20"/>
-                    <circle cx="200" cy="140" r="45" fill="#FAF6EE"/>
-                    <g stroke="#E5B83A" stroke-width="8" stroke-linecap="round">
-                      <line x1="200" y1="65" x2="200" y2="85"/>
-                      <line x1="150" y1="80" x2="162" y2="98"/>
-                      <line x1="250" y1="80" x2="238" y2="98"/>
-                      <line x1="110" y1="110" x2="130" y2="120"/>
-                      <line x1="290" y1="110" x2="270" y2="120"/>
-                    </g>
-                    <polygon points="120,200 180,130 230,190" fill="#7C4328"/>
-                    <polygon points="170,210 220,110 290,200" fill="#A35D3B"/>
-                    <polygon points="250,210 290,150 330,200" fill="#7C4328"/>
-                    <path d="M 40,150 Q 50,70 200,40" fill="none" stroke="#E5B83A" stroke-width="6"/>
-                    <path d="M 360,150 Q 350,70 200,40" fill="none" stroke="#E5B83A" stroke-width="6"/>
-                    <text x="200" y="240" font-family="'Cinzel', serif" font-weight="bold" font-size="28" fill="#FAF6EE" text-anchor="middle">SERRANOBLE</text>
-                  </svg>
-                </div>
-                <div>
-                  <h4 class="font-brand font-bold text-serranoble-gold tracking-wide text-sm">MUNICIPALIDAD DE SERRANOBLE</h4>
-                  <p class="text-[10px] text-slate-300">Gestión de Reclamos y Servicios Públicos</p>
-                </div>
-              </div>
-              <span class="text-[10px] bg-serranoble-navyDark text-serranoble-gold border border-serranoble-gold/30 px-2 py-1 rounded">
-                Oficial
-              </span>
-            </div>
-
-            <!-- Contenido del Mensaje -->
-            <div class="p-5 space-y-4">
-              <p>Estimado/a <strong id="mailBodyName" class="text-slate-900">--</strong>,</p>
-              
-              <p class="leading-relaxed text-slate-600">
-                Agradecemos tu compromiso con el municipio. Tu solicitud ha sido registrada correctamente en la plataforma <strong>Municipio Activo Serranoble</strong>.
-              </p>
-
-              <!-- Caja destacada del CÓDIGO GENERADO en tonos Dorados / Azul Serranoble -->
-              <div class="bg-serranoble-goldLight border-2 border-serranoble-gold rounded-xl p-4 text-center my-3 relative shadow-inner">
-                <span class="text-[10px] uppercase font-bold text-serranoble-brown tracking-wider block mb-1">
-                  Tu Código Único de Seguimiento
-                </span>
-                <div class="flex items-center justify-center space-x-3">
-                  <span id="mailTrackingCode" class="text-2xl font-black font-mono text-serranoble-navy tracking-widest">
-                    ---
-                  </span>
-                  <button type="button" id="btnCopyCode" class="text-serranoble-navy hover:text-serranoble-brown bg-serranoble-gold/40 hover:bg-serranoble-gold/70 p-1.5 rounded-lg transition-all text-xs" title="Copiar código">
-                    <i class="fa-regular fa-copy"></i>
-                  </button>
-                </div>
-                <p class="text-[11px] text-serranoble-brown font-medium mt-1">Conserva este código para verificar el estado de tu reclamo en la sección de seguimiento.</p>
-              </div>
-
-              <!-- Detalle del Reclamo -->
-              <div class="bg-slate-50 rounded-lg p-3 border border-slate-200 text-xs space-y-1.5">
-                <div class="flex justify-between">
-                  <span class="text-slate-500">Categoría:</span>
-                  <span id="mailBodyCategory" class="font-semibold text-serranoble-navy">--</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-slate-500">Estado Inicial:</span>
-                  <span class="inline-flex items-center text-amber-700 font-semibold">
-                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5"></span> PENDIENTE DE REVISIÓN
-                  </span>
-                </div>
-                <div class="pt-1 border-t border-slate-200">
-                  <span class="text-slate-500 block mb-0.5">Descripción ingresada:</span>
-                  <p id="mailBodyDesc" class="italic text-slate-700 bg-white p-2 rounded border border-slate-100">--</p>
-                </div>
-              </div>
-
-              <div class="pt-2 flex justify-between items-center text-xs">
-                <a href="seguimiento.html" class="text-serranoble-navy hover:underline font-semibold flex items-center">
-                  <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i> Ir al portal de seguimiento
-                </a>
-                <span class="text-[11px] text-slate-400">Atención Ciudadana Serranoble</span>
-              </div>
-
-              <p class="text-xs text-slate-500 pt-2 border-t border-slate-100">
-                Atentamente,<br>
-                <strong class="text-serranoble-navy">Centro de Atención al Vecino • Municipalidad de Serranoble</strong>
-              </p>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </section>
-
-  </main>
-
-  <!-- Notification Toast -->
-  <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 z-50 bg-serranoble-navy text-white px-4 py-3 rounded-xl shadow-xl flex items-center space-x-3 border border-serranoble-gold">
-    <div class="bg-serranoble-gold text-serranoble-navy rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
-      <i class="fa-solid fa-check"></i>
-    </div>
-    <div class="text-xs">
-      <p id="toastTitle" class="font-bold text-serranoble-gold">¡Reclamo Registrado!</p>
-      <p id="toastMessage" class="text-slate-200">Código listo para consultar. No se envió un correo.</p>
-    </div>
-  </div>
-
-<footer data-site-footer></footer>
-
-  <!-- Scripts de la página -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="js/api.js"></script>
     <script src="js/componentes-comunes.js"></script>
-  <script src="js/main.js"></script>
-  <script src="js/accesibilidad.js"></script>
-  <script src="js/reclamo-validaciones1.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/accesibilidad.js"></script>
+    <script src="js/reclamo-validaciones1.js"></script>
 </body>
 </html>

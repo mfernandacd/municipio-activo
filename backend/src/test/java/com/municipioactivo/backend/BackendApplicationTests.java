@@ -68,6 +68,7 @@ class BackendApplicationTests {
 				"/administrar-noticias.html", "/reclamos-municipal.html", "/seguimiento.html",
 				"/servicios.html", "/vista-reclamo.html", "/control_interactivo_en_interfaz.html",
 				"/interfaz_de_consultas.html", "/Css/styles.css", "/Css/noticias.css", "/js/api.js",
+				"/js/reclamo-sesion.js",
 				"/js/componentes-comunes.js", "/assets/logo/Logo.jpeg"
 		}) {
 			var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + page)).GET().build();
@@ -75,6 +76,13 @@ class BackendApplicationTests {
 			assertEquals(200, response.statusCode(), page);
 			if (page.equals("/seguimiento.html")) {
 				assertTrue(response.body().contains("tracking-form"));
+			}
+			if (page.equals("/reclamos-municipal.html")) {
+				assertTrue(response.body().contains("id=\"claimNeighborhood\""));
+				assertTrue(response.body().contains("id=\"claimZone\""));
+				assertTrue(response.body().contains("id=\"userName\" class=\"form-control claim-readonly\" type=\"text\" autocomplete=\"name\" readonly"));
+				assertTrue(!response.body().contains("Base de Datos"));
+				assertTrue(!response.body().contains("Simulador"));
 			}
 		}
 	}
@@ -107,6 +115,53 @@ class BackendApplicationTests {
 				.build();
 
 		assertEquals(403, HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString()).statusCode());
+	}
+
+	@Test
+	void rejectsClaimCreationForAnonymousUsersWithCsrfToken() throws Exception {
+		HttpClient client = HttpClient.newBuilder().cookieHandler(new CookieManager()).build();
+		CsrfInfo csrf = fetchCsrf(client);
+		String body = """
+				{"categoria":"Bacheo","direccion":"Calle Belgrano 450","barrio":"Centro",
+				"zona":"CENTRO","googleMapsUrl":"","descripcion":"Hay un bache que dificulta el paso."}
+				""";
+		var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/reclamos"))
+				.header("Content-Type", "application/json")
+				.header(csrf.headerName(), csrf.token())
+				.POST(HttpRequest.BodyPublishers.ofString(body))
+				.build();
+
+		assertEquals(403, client.send(request, HttpResponse.BodyHandlers.ofString()).statusCode());
+	}
+
+	@Test
+	void authenticatedCitizenCanCreateClaimWithNeighborhoodAndZone() throws Exception {
+		String email = "ciudadano-reclamo-" + UUID.randomUUID() + "@example.com";
+		HttpClient client = authenticatedClient("ciudadano", email);
+		CsrfInfo csrf = fetchCsrf(client);
+		String body = """
+				{"categoria":"Bacheo","direccion":"Calle Belgrano 450","barrio":"Villa Norte",
+				"zona":"NORTE","googleMapsUrl":"","descripcion":"Hay un bache que dificulta el paso."}
+				""";
+		var request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/api/reclamos"))
+				.header("Content-Type", "application/json")
+				.header(csrf.headerName(), csrf.token())
+				.POST(HttpRequest.BodyPublishers.ofString(body))
+				.build();
+		var response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+		assertEquals(201, response.statusCode());
+		assertTrue(response.body().contains("\"barrio\":\"Villa Norte\""));
+		assertTrue(response.body().contains("\"zona\":\"NORTE\""));
+		assertTrue(!response.body().contains("passwordHash"));
+
+		String trackingCode = jsonValue(response.body(), "codigoSeguimiento");
+		Reclamo savedClaim = reclamoRepository.findByCodigoSeguimientoIgnoreCase(trackingCode).orElseThrow();
+		assertEquals("Villa Norte", savedClaim.getBarrio());
+		assertEquals("NORTE", savedClaim.getZona());
+		assertEquals(
+				usuarioRepository.findByEmailIgnoreCaseAndActivoTrue(email).orElseThrow().getId(),
+				savedClaim.getUsuario().getId());
 	}
 
 	@Test
@@ -237,7 +292,7 @@ class BackendApplicationTests {
 	@Test
 	void allowsClaimTrackingByCodeWithoutExposingPrivateClaimDetails() throws Exception {
 		Reclamo reclamo = new Reclamo(
-				"Bacheo", "Calle confidencial 123", "", "Descripción privada del reclamo.", "");
+				"Bacheo", "Calle confidencial 123", "Centro", "CENTRO", "", "Descripción privada del reclamo.", "");
 		reclamo.setCodigoSeguimiento("ABC123DEF456");
 		reclamoRepository.save(reclamo);
 

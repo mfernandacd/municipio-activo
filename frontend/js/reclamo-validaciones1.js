@@ -1,368 +1,109 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Referencias principales del formulario y botones
-    const claimForm = document.getElementById('claimForm') || document.getElementById('formReclamo');
-    const submitBtn = document.getElementById('submitBtn');
-    const btnFillExample = document.getElementById('btnFillExample');
-    const btnResetAll = document.getElementById('btnResetAll');
-    const btnCopyCode = document.getElementById('btnCopyCode');
+document.addEventListener('DOMContentLoaded', async () => {
+    const form = document.getElementById('claimForm');
+    const submitButton = document.getElementById('submitBtn');
+    const nameInput = document.getElementById('userName');
+    const emailInput = document.getElementById('userEmail');
 
-    // Campos del formulario
-    const userNameInput = document.getElementById('userName');
-    const userEmailInput = document.getElementById('userEmail');
-    const categoriaSelect = document.getElementById('claimCategory') || document.getElementById('categoria');
-    const direccionInput = document.getElementById('claimAddress') || document.getElementById('direccion');
-    const descripcionInput = document.getElementById('claimDescription') || document.getElementById('descripcion');
-    const googleMapsInput = document.getElementById('googleMapsUrl');
+    if (!form || !submitButton || !nameInput || !emailInput) return;
 
-    // Paneles de Servidor / BD
-    const jsonOutput = document.getElementById('jsonOutput');
-    const processingState = document.getElementById('processingState');
-    const codeGeneratedBadge = document.getElementById('codeGeneratedBadge');
+    const usuario = await window.municipioSessionReady;
+    if (!usuario) return;
 
-    // Bandeja de Entrada de Mail Simulado
-    const mailEmptyState = document.getElementById('mailEmptyState');
-    const mailContent = document.getElementById('mailContent');
-    const mailTo = document.getElementById('mailTo');
-    const mailSubject = document.getElementById('mailSubject');
-    const mailTimestamp = document.getElementById('mailTimestamp');
-    const mailBodyName = document.getElementById('mailBodyName');
-    const mailTrackingCode = document.getElementById('mailTrackingCode');
-    const mailBodyCategory = document.getElementById('mailBodyCategory');
-    const mailBodyDesc = document.getElementById('mailBodyDesc');
-    const mailCount = document.getElementById('mailCount');
+    nameInput.value = usuario.nombre;
+    emailInput.value = usuario.email;
+    nameInput.readOnly = true;
+    emailInput.readOnly = true;
 
-    // Toast flotante
-    const toast = document.getElementById('toast');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMessage = document.getElementById('toastMessage');
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
 
-    const MIN_CARACTERES_DESCRIPCION = 15;
+        const payload = {
+            categoria: document.getElementById('claimCategory').value.trim(),
+            direccion: document.getElementById('claimAddress').value.trim(),
+            barrio: document.getElementById('claimNeighborhood').value.trim(),
+            zona: document.getElementById('claimZone').value,
+            googleMapsUrl: document.getElementById('googleMapsUrl').value.trim(),
+            descripcion: document.getElementById('claimDescription').value.trim()
+        };
 
-    // Conectar botón para cargar datos de ejemplo
-    if (btnFillExample) {
-        btnFillExample.addEventListener('click', (e) => {
-            e.preventDefault();
-            cargarDatosEjemplo();
-        });
-    }
-
-    // Conectar botón para restablecer el formulario
-    if (btnResetAll) {
-        btnResetAll.addEventListener('click', (e) => {
-            e.preventDefault();
-            reiniciarFormulario();
-        });
-    }
-
-    // Conectar botón para copiar código de seguimiento
-    if (btnCopyCode) {
-        btnCopyCode.addEventListener('click', (e) => {
-            e.preventDefault();
-            copiarCodigoSeguimiento();
-        });
-    }
-
-    // Manejar el envío del formulario
-    if (claimForm) {
-        claimForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const nombreVal = userNameInput ? userNameInput.value.trim() : '';
-            const emailVal = userEmailInput ? userEmailInput.value.trim() : '';
-            const categoriaVal = categoriaSelect ? categoriaSelect.value.trim() : '';
-            const direccionVal = direccionInput ? direccionInput.value.trim() : '';
-            const descripcionVal = descripcionInput ? descripcionInput.value.trim() : '';
-
-            // 1. Validar Categoría
-            if (!categoriaVal) {
-                await mostrarAlerta('Categoría requerida', 'Por favor, selecciona una categoría para clasificar tu reclamo.', 'warning');
-                if (categoriaSelect) categoriaSelect.focus();
-                return;
-            }
-
-            // 2. Validar Descripción mínima
-            if (descripcionVal.length < MIN_CARACTERES_DESCRIPCION) {
-                await mostrarAlerta(
-                    'Descripción insuficiente',
-                    `La descripción debe contener al menos ${MIN_CARACTERES_DESCRIPCION} caracteres. Actualmente tiene ${descripcionVal.length}.`,
-                    'warning'
-                );
-                if (descripcionInput) descripcionInput.focus();
-                return;
-            }
-
-            // 3. Validar Email si se ingresa
-            if (emailVal && !esEmailValido(emailVal)) {
-                await mostrarAlerta('Correo inválido', 'Por favor, ingresá un correo electrónico válido.', 'warning');
-                if (userEmailInput) userEmailInput.focus();
-                return;
-            }
-
-            // 4. Modal de confirmación SweetAlert2
-            const confirmacion = typeof Swal !== 'undefined'
-                ? await Swal.fire({
-                    title: '¿Confirmar envío del reporte?',
-                    text: 'Tu solicitud será registrada en el Municipio de Serranoble y se generará tu código de seguimiento.',
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#0A2240',
-                    cancelButtonColor: '#7C4328',
-                    confirmButtonText: 'Sí, enviar reclamo',
-                    cancelButtonText: 'Cancelar'
-                })
-                : { isConfirmed: window.confirm('¿Desea enviar el reclamo?') };
-
-            if (!confirmacion.isConfirmed) return;
-
-            // 5. Armar payload JSON para el backend
-            const payload = {
-                categoria: categoriaVal,
-                direccion: direccionVal || 'Ubicación informada en descripción',
-                googleMapsUrl: googleMapsInput ? googleMapsInput.value.trim() : '',
-                descripcion: descripcionVal,
-                userName: nombreVal || 'Vecino Serranoble',
-                userEmail: emailVal
-            };
-
-            await enviarReclamoAlServidor(payload);
-        });
-    }
-
-    /**
-     * Envía la petición POST en formato JSON al backend de Spring Boot
-     */
-    async function enviarReclamoAlServidor(payload) {
-        establecerEstadoCarga(true);
-
+        setLoading(true);
         try {
-            const endpoint = resolverApiUrl('/api/reclamos');
-            const response = await window.municipioFetch(endpoint, {
+            const response = await window.municipioFetch(resolverApiUrl('/api/reclamos'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    Accept: 'application/json'
                 },
                 body: JSON.stringify(payload)
             });
 
+            const responseBody = await leerRespuesta(response);
             if (!response.ok) {
-                const errorTexto = await response.text();
-                let errorMsg = `Error en el servidor (código ${response.status})`;
-                try {
-                    const errorJson = JSON.parse(errorTexto);
-                    if (errorJson.message) errorMsg = errorJson.message;
-                    if (errorJson.detail) errorMsg = errorJson.detail;
-                } catch {
-                    if (errorTexto && errorTexto.length < 120) errorMsg = errorTexto;
+                if (response.status === 401) {
+                    window.localStorage.removeItem('usuarioMunicipio');
+                    window.sessionStorage.removeItem('usuarioMunicipio');
+                    window.sessionStorage.setItem(
+                        'mensajeAccesoLogin',
+                        'Tu sesión venció. Iniciá sesión nuevamente para presentar el reclamo.'
+                    );
+                    window.location.replace('login.html');
+                    return;
                 }
-                throw new Error(errorMsg);
+                throw new Error(responseBody.message || responseBody.detail || `Error del servidor (${response.status}).`);
             }
 
-            const reclamoGuardado = await response.json();
-            const trackingCode = reclamoGuardado.codigoSeguimiento;
-            if (!trackingCode) {
-                throw new Error('El servidor registró el reclamo, pero no devolvió el código de seguimiento.');
-            }
-            const fechaHora = reclamoGuardado.fechaCreacion
-                ? new Date(reclamoGuardado.fechaCreacion).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-            // 1. Actualizar consola de Servidor / BD
-            if (jsonOutput) {
-                const dbRecord = {
-                    municipio: "Serranoble",
-                    tabla: "reclamos",
-                    operacion: "INSERT",
-                    id: reclamoGuardado.id,
-                    codigo_seguimiento: trackingCode,
-                    vecino: {
-                        nombre: payload.userName,
-                        email: payload.userEmail
-                    },
-                    categoria: reclamoGuardado.categoria || payload.categoria,
-                    direccion: reclamoGuardado.direccion || payload.direccion,
-                    descripcion: reclamoGuardado.descripcion || payload.descripcion,
-                    estado: reclamoGuardado.estado || "PENDIENTE",
-                    creado_el: reclamoGuardado.fechaCreacion || new Date().toISOString(),
-                    correo_de_confirmacion_simulado: true
-                };
-                jsonOutput.textContent = JSON.stringify(dbRecord, null, 2);
+            const codigo = responseBody.codigoSeguimiento;
+            if (!codigo) {
+                throw new Error('El reclamo se registró, pero el servidor no devolvió el código de seguimiento.');
             }
 
-            if (codeGeneratedBadge) {
-                codeGeneratedBadge.classList.remove('hidden');
-            }
-
-            // 2. Actualizar Bandeja de Entrada de Mail Simulado
-            if (mailTo) {
-                mailTo.textContent = payload.userEmail
-                    ? `${payload.userName} <${payload.userEmail}>`
-                    : payload.userName;
-            }
-            if (mailSubject) mailSubject.textContent = `Confirmación Reclamo Serranoble [${trackingCode}]`;
-            if (mailTimestamp) mailTimestamp.textContent = fechaHora;
-            if (mailBodyName) mailBodyName.textContent = payload.userName;
-            if (mailTrackingCode) mailTrackingCode.textContent = trackingCode;
-            if (mailBodyCategory) mailBodyCategory.textContent = payload.categoria;
-            if (mailBodyDesc) mailBodyDesc.textContent = `"${payload.descripcion}"`;
-
-            if (mailEmptyState) mailEmptyState.classList.add('hidden');
-            if (mailContent) mailContent.classList.remove('hidden');
-            if (mailCount) mailCount.textContent = '1 vista previa (simulada)';
-
-            // 3. Notificación SweetAlert2
-            if (typeof Swal !== 'undefined') {
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Reclamo Registrado en Serranoble!',
-                    html: `<p class="mb-2">Tu reclamo fue guardado exitosamente en el servidor.</p>
-                           <p class="font-mono font-bold text-lg text-serranoble-navy">Código: <strong>${trackingCode}</strong></p>
-                           <p class="text-xs text-slate-500 mt-1">Esta es una vista previa; no se envió un correo a <strong>${payload.userEmail}</strong>.</p>`,
-                    confirmButtonColor: '#0A2240',
-                    confirmButtonText: 'Aceptar'
-                });
-            }
-
-            // 4. Toast flotante
-            mostrarToast('¡Reclamo registrado!', `Código ${trackingCode} listo para consultar.`);
-
-        } catch (error) {
-            console.error('Error al registrar reclamo:', error);
-            await mostrarAlerta(
-                'No se pudo registrar el reclamo',
-                error instanceof TypeError
-                    ? 'No se pudo conectar con el servidor. Verificá que la API esté activa y la conexión a red.'
-                    : (error.message || 'Ocurrió un error inesperado al procesar la solicitud.'),
-                'error'
+            await mostrarAviso(
+                'success',
+                'Reclamo registrado',
+                `Guardamos tu reclamo. Tu código de seguimiento es ${codigo}.`
             );
+            form.reset();
+            nameInput.value = usuario.nombre;
+            emailInput.value = usuario.email;
+        } catch (error) {
+            console.error('No se pudo registrar el reclamo.', error);
+            const mensaje = error instanceof TypeError
+                ? 'No se pudo conectar con el servidor. Revisá la conexión e intentá nuevamente.'
+                : error.message || 'Ocurrió un error al registrar el reclamo.';
+            await mostrarAviso('error', 'No se pudo registrar el reclamo', mensaje);
         } finally {
-            establecerEstadoCarga(false);
+            setLoading(false);
         }
+    });
+
+    function setLoading(loading) {
+        submitButton.disabled = loading;
+        submitButton.innerHTML = loading
+            ? '<i class="fa-solid fa-spinner fa-spin me-2" aria-hidden="true"></i>Enviando reclamo…'
+            : '<i class="fa-solid fa-paper-plane me-2" aria-hidden="true"></i>Enviar reclamo';
     }
 
-    function establecerEstadoCarga(cargando) {
-        if (submitBtn) {
-            submitBtn.disabled = cargando;
-            if (cargando) {
-                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Registrando en Serranoble...</span>';
-            } else {
-                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
-                submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Enviar Reclamo a Serranoble</span>';
-            }
-        }
-        if (processingState) {
-            if (cargando) {
-                processingState.classList.remove('hidden');
-            } else {
-                processingState.classList.add('hidden');
-            }
-        }
-    }
+    async function leerRespuesta(response) {
+        const responseText = await response.text();
+        if (!responseText) return {};
 
-    function cargarDatosEjemplo() {
-        if (userNameInput) userNameInput.value = 'Roberto Soria';
-        if (userEmailInput) userEmailInput.value = 'roberto.soria@ejemplo.com';
-        if (categoriaSelect) categoriaSelect.value = 'Alumbrado y Luminarias Serranas';
-        if (direccionInput) direccionInput.value = 'Calle Los Cerros esquina Camino del Sol';
-        if (descripcionInput) descripcionInput.value = 'Falta de iluminación pública en la calle Los Cerros esquina Camino del Sol. Varias luminarias LED fuera de servicio.';
-
-        mostrarToast('Datos cargados', 'Se completó el formulario con un reclamo de ejemplo.');
-    }
-
-    function reiniciarFormulario() {
-        if (claimForm) claimForm.reset();
-        if (jsonOutput) {
-            jsonOutput.textContent = '// Esperando ingreso de reclamo...\n{\n  "municipio": "Serranoble",\n  "status": "idle",\n  "message": "Ningún reclamo enviado aún."\n}';
-        }
-        if (codeGeneratedBadge) codeGeneratedBadge.classList.add('hidden');
-        if (processingState) processingState.classList.add('hidden');
-
-        if (mailEmptyState) mailEmptyState.classList.remove('hidden');
-        if (mailContent) mailContent.classList.add('hidden');
-        if (mailCount) mailCount.textContent = '0 mensajes';
-
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
-            submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Enviar Reclamo a Serranoble</span>';
-        }
-
-        mostrarToast('Simulador Reiniciado', 'Podés realizar un nuevo reclamo para Serranoble.');
-    }
-
-    function copiarCodigoSeguimiento() {
-        const code = mailTrackingCode ? mailTrackingCode.textContent.trim() : '';
-        if (!code || code === '---') return;
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(code).then(() => {
-                mostrarToast('Código Copiado', `${code} guardado en el portapapeles.`);
-            }).catch(() => {
-                copiarConFallback(code);
-            });
-        } else {
-            copiarConFallback(code);
-        }
-    }
-
-    function copiarConFallback(code) {
-        const textarea = document.createElement('textarea');
-        textarea.value = code;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
         try {
-            document.execCommand('copy');
-            mostrarToast('Código Copiado', `${code} guardado en el portapapeles.`);
+            return JSON.parse(responseText);
         } catch {
-            mostrarToast('Atención', 'No se pudo copiar automáticamente.');
-        } finally {
-            document.body.removeChild(textarea);
+            throw new Error('El servidor devolvió una respuesta no válida.');
         }
-    }
-
-    function mostrarToast(title, message) {
-        if (!toast || !toastTitle || !toastMessage) return;
-        toastTitle.textContent = title;
-        toastMessage.textContent = message;
-
-        toast.classList.remove('translate-y-20', 'opacity-0');
-        toast.classList.add('translate-y-0', 'opacity-100');
-
-        setTimeout(() => {
-            toast.classList.remove('translate-y-0', 'opacity-100');
-            toast.classList.add('translate-y-20', 'opacity-0');
-        }, 4000);
-    }
-
-    function mostrarAlerta(title, text, icon = 'info') {
-        if (typeof Swal !== 'undefined') {
-            return Swal.fire({
-                icon,
-                title,
-                text,
-                confirmButtonColor: '#0A2240',
-                confirmButtonText: 'Aceptar'
-            });
-        }
-        alert(`${title}: ${text}`);
-        return Promise.resolve();
-    }
-
-    function esEmailValido(email) {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     function resolverApiUrl(endpoint) {
-        return window.municipioApiUrl(endpoint, 'reclamos-api-base-url');
+        return window.municipioApiUrl(endpoint, 'municipio-api-base-url');
     }
 
-    // Exponer helpers en window para accesibilidad si es necesario
-    window.reclamoApp = {
-        cargarDatosEjemplo,
-        reiniciarFormulario,
-        copiarCodigoSeguimiento
-    };
+    async function mostrarAviso(icon, title, text) {
+        if (window.Swal?.fire) {
+            await window.Swal.fire({ icon, title, text, confirmButtonColor: '#0A2240' });
+            return;
+        }
+        window.alert(`${title}: ${text}`);
+    }
 });

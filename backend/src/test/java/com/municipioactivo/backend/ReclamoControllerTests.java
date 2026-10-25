@@ -10,41 +10,53 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.server.ResponseStatusException;
 
 class ReclamoControllerTests {
 
     private ReclamoService reclamoService;
     private ReclamoController controller;
+    private Authentication authentication;
 
     @BeforeEach
     void setUp() {
         reclamoService = mock(ReclamoService.class);
         controller = new ReclamoController(reclamoService);
+        authentication = UsernamePasswordAuthenticationToken.authenticated(
+                "vecino@example.com", null, List.of());
     }
 
     @Test
     void createsNewPendingClaimFromPublicFieldsOnly() throws Exception {
-        when(reclamoService.guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class)))
+        when(reclamoService.registrarReclamo(
+                org.mockito.ArgumentMatchers.any(Reclamo.class), org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = controller.crearReclamo(
                 new ReclamoController.ReclamoRequest(
                         "Bacheo",
                         "Calle Belgrano 450",
+                        "Norte",
+                        "NORTE",
                         "https://maps.google.com/",
                         "Hay un bache que dificulta el paso."),
-                null);
+                null,
+                authentication);
 
         Reclamo savedClaim = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("PENDIENTE", savedClaim.getEstado());
         assertEquals("Bacheo", savedClaim.getCategoria());
+        assertEquals("Norte", savedClaim.getBarrio());
+        assertEquals("NORTE", savedClaim.getZona());
         assertNull(savedClaim.getId());
         assertNull(savedClaim.getFechaCreacion());
         assertNull(savedClaim.getCodigoSeguimiento());
@@ -52,24 +64,27 @@ class ReclamoControllerTests {
 
     @Test
     void createsNewPendingClaimFromJson() {
-        when(reclamoService.guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class)))
+        when(reclamoService.registrarReclamo(
+                org.mockito.ArgumentMatchers.any(Reclamo.class), org.mockito.ArgumentMatchers.anyString()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
         var response = controller.crearReclamoJson(
                 new ReclamoController.ReclamoJsonRequest(
                         "Alumbrado y Luminarias Serranas",
                         "Calle Los Cerros esquina Camino del Sol",
+                        "Centro",
+                        "CENTRO",
                         "",
-                        "Falta de iluminación pública en la esquina.",
-                        "",
-                        "Roberto Soria",
-                        "roberto.soria@ejemplo.com"));
+                        "Falta de iluminación pública en la esquina."),
+                authentication);
 
         Reclamo savedClaim = response.getBody();
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals("PENDIENTE", savedClaim.getEstado());
         assertEquals("Alumbrado y Luminarias Serranas", savedClaim.getCategoria());
         assertEquals("Calle Los Cerros esquina Camino del Sol", savedClaim.getDireccion());
+        assertEquals("Centro", savedClaim.getBarrio());
+        assertEquals("CENTRO", savedClaim.getZona());
     }
 
     @Test
@@ -79,9 +94,12 @@ class ReclamoControllerTests {
                         new ReclamoController.ReclamoRequest(
                                 "Bacheo",
                                 "Calle Belgrano 450",
+                                "Norte",
+                                "NORTE",
                                 "",
                                 "Hay un bache que dificulta el paso."),
-                        new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1})));
+                        new MockMultipartFile("imagen", "../../imagen.svg", "image/svg+xml", new byte[]{1}),
+                        authentication));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         verify(reclamoService, never()).guardarReclamo(org.mockito.ArgumentMatchers.any(Reclamo.class));
@@ -89,7 +107,8 @@ class ReclamoControllerTests {
 
     @Test
     void updatesClaimWithSupportedState() {
-        Reclamo reclamo = new Reclamo("Bacheo", "Calle Belgrano 450", "", "Hay un bache que dificulta el paso.", "");
+        Reclamo reclamo = new Reclamo(
+                "Bacheo", "Calle Belgrano 450", "Norte", "NORTE", "", "Hay un bache que dificulta el paso.", "");
         reclamo.setId(12L);
         when(reclamoService.buscarPorId(12L)).thenReturn(Optional.of(reclamo));
         when(reclamoService.guardarReclamo(any(Reclamo.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -113,7 +132,8 @@ class ReclamoControllerTests {
 
     @Test
     void findsClaimByTrackingCode() {
-        Reclamo reclamo = new Reclamo("Bacheo", "Calle Belgrano 450", "", "Hay un bache que dificulta el paso.", "");
+        Reclamo reclamo = new Reclamo(
+                "Bacheo", "Calle Belgrano 450", "Norte", "NORTE", "", "Hay un bache que dificulta el paso.", "");
         when(reclamoService.buscarPorCodigoSeguimiento("ABC123")).thenReturn(Optional.of(reclamo));
 
         var response = controller.consultarPorCodigo(" ABC123 ");

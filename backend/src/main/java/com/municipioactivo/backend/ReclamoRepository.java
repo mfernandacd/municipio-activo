@@ -9,5 +9,7 @@ public interface ReclamoRepository extends JpaRepository<Reclamo, Long> {
 
     List<Reclamo> findByEstado(String estado);
 
+    List<Reclamo> findByBarrioIgnoreCaseAndZonaIgnoreCaseOrderByFechaCreacionDesc(String barrio, String zona);
+
     Optional<Reclamo> findByCodigoSeguimientoIgnoreCase(String codigoSeguimiento);
 }

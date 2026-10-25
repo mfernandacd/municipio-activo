@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.status === 401) {
-                localStorage.removeItem('usuarioMunicipio');
+                limpiarUsuarioEnAlmacenamiento();
                 if (document.body.hasAttribute('data-auth-required')) {
                     redirigirALogin('Se requiere registrar para poner un reclamo');
                     return null;
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`La API respondió con el error ${response.status}.`);
             }
 
-            localStorage.removeItem('usuarioMunicipio');
+            limpiarUsuarioEnAlmacenamiento();
             authContainer.replaceChildren(authLink);
             window.location.reload();
         } catch (error) {
@@ -100,5 +100,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return typeof privilegios === 'string'
             ? privilegios.split(',').map((privilegio) => privilegio.trim()).filter(Boolean)
             : [];
+    }
+
+    function limpiarUsuarioEnAlmacenamiento() {
+        localStorage.removeItem('usuarioMunicipio');
+        sessionStorage.removeItem('usuarioMunicipio');
     }
 });

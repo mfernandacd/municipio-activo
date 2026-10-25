@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/auth/csrf").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/session").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auth/logout").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/reclamos").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/reclamos").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/noticias", "/api/noticias/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/noticias", "/api/noticias/**")
                     .access((authentication, context) -> new AuthorizationDecision(

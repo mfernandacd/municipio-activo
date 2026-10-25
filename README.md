@@ -2,7 +2,7 @@
 
 Portal web municipal para registrar y seguir reclamos, consultar noticias y administrar el contenido publicado. El backend Spring Boot sirve también los archivos estáticos del frontend.
 
-La pantalla de reclamos muestra una vista previa de confirmación por correo; el proyecto no incluye todavía un servicio SMTP ni envía mensajes reales.
+La página de reclamos requiere una sesión activa y muestra el código real de seguimiento que devuelve la API.
 
 ## Tecnologías y requisitos
 
@@ -14,24 +14,18 @@ La pantalla de reclamos muestra una vista previa de confirmación por correo; el
 
 La aplicación usa Spring Boot, Spring Web MVC, Spring Security, Spring Data JPA, Jakarta Validation, MySQL Connector/J, HTML, Bootstrap, Tailwind CSS y JavaScript.
 
-## Configurar una base nueva
+## Configurar el esquema de base de datos
 
-1. Crea una base MySQL con `utf8mb4`:
+En Clever Cloud, utiliza la base MySQL que asigna el complemento. Selecciona ese esquema en el cliente SQL y ejecuta [`frontend/Sql/schema.sql`](frontend/Sql/schema.sql); el archivo crea las tablas dentro del esquema seleccionado, sin crear ni seleccionar una base con un nombre propio. Para una base existente, ejecuta [`frontend/Sql/migracion_tabla_imagenes.sql`](frontend/Sql/migracion_tabla_imagenes.sql) antes de desplegar para añadir las columnas de barrio y zona.
 
-   ```sql
-   CREATE DATABASE municipio_activo
-       CHARACTER SET utf8mb4
-       COLLATE utf8mb4_unicode_ci;
-   ```
+Para desarrollo local, crea una base vacía desde tu cliente MySQL y luego ejecuta el mismo esquema. Configura la conexión mediante variables de entorno; no guardes contraseñas en Git:
 
-2. Ejecuta [`frontend/Sql/schema.sql`](frontend/Sql/schema.sql) sobre esa base. El esquema crea las tablas vacías y no inserta cuentas ni reclamos.
-
-3. Configura la conexión mediante variables de entorno. No guardes contraseñas en Git:
+1. Configura la conexión mediante variables de entorno. No guardes contraseñas en Git:
 
    ```text
    DB_HOST=localhost
    DB_PORT=3306
-   DB_NAME=municipio_activo
+   DB_NAME=nombre_de_la_base_local
    DB_USER=usuario_app
    DB_PASSWORD=contraseña_local
    ```
@@ -40,7 +34,7 @@ La aplicación usa Spring Boot, Spring Web MVC, Spring Security, Spring Data JPA
 
 4. Para crear una cuenta administrativa, primero regístrala desde el portal y luego ejecuta [`frontend/Sql/asignar-rol-administrativo.sql`](frontend/Sql/asignar-rol-administrativo.sql) tras sustituir el correo de ejemplo.
 
-[`frontend/Sql/noticias_iniciales.sql`](frontend/Sql/noticias_iniciales.sql) carga noticias públicas de ejemplo y se puede ejecutar después del esquema. [`frontend/Sql/migracion_tabla_imagenes.sql`](frontend/Sql/migracion_tabla_imagenes.sql) es una migración para bases antiguas; no se necesita en una base recién creada con `schema.sql`.
+[`frontend/Sql/noticias_iniciales.sql`](frontend/Sql/noticias_iniciales.sql) carga noticias públicas de ejemplo y se puede ejecutar después del esquema. La página de reclamos registra categoría, dirección, barrio, zona y descripción; el servidor asocia cada solicitud a la cuenta autenticada.
 
 No se debe versionar un volcado de producción: contiene datos personales y hashes de contraseña. Si una copia anterior ya llegó a un remoto, hay que purgarla del historial y rotar cualquier credencial relacionada.
 
@@ -63,8 +57,9 @@ Abre [http://localhost:8080/](http://localhost:8080/). También puedes iniciar [
 
 - `POST /api/auth/registro`, `POST /api/auth/login`, `GET /api/auth/session`, `POST /api/auth/logout`.
 - `GET /api/auth/csrf` entrega el token CSRF que usan las operaciones de escritura.
-- `POST /api/reclamos` registra un reclamo; `GET /api/reclamos/seguimiento/{código}` devuelve su seguimiento público.
+- `POST /api/reclamos` registra un reclamo para la cuenta autenticada; `GET /api/reclamos/seguimiento/{código}` devuelve su seguimiento público.
 - `GET /api/reclamos` y `PUT /api/reclamos/{id}/estado` requieren rol administrativo.
+- `GET /api/reclamos/ubicacion?barrio={barrio}&zona={zona}` filtra por ubicación y requiere rol administrativo.
 - `GET /api/noticias` y `GET /api/noticias/{slug}` son públicos; crear, modificar y eliminar noticias requiere rol administrativo.
 
 ## Pruebas
