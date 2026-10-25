@@ -59,11 +59,11 @@
                             <input id="claimAddress" name="direccion" class="form-control" type="text" maxlength="255" autocomplete="street-address" placeholder="Calle y altura o referencia" required>
                         </div>
 
-                        <!-- ZONA (Se asignará automáticamente o se puede seleccionar) -->
+                        <!-- ZONA (Se completa automáticamente de forma excluyente según el barrio) -->
                         <div class="col-md-6">
                             <label for="claimZone" class="form-label">Zona <span aria-hidden="true">*</span></label>
-                            <select id="claimZone" name="zona" class="form-select" required>
-                                <option value="" selected disabled>Seleccioná una zona</option>
+                            <select id="claimZone" name="zona" class="form-select" disabled required>
+                                <option value="" selected disabled>Se seleccionará automáticamente</option>
                                 <option value="NORTE">Norte</option>
                                 <option value="SUR">Sur</option>
                                 <option value="ESTE">Este</option>
@@ -71,9 +71,10 @@
                                 <option value="CENTRO">Centro</option>
                                 <option value="RURAL">Rural</option>
                             </select>
+                            <div class="form-text">Se asigna automáticamente al elegir el barrio.</div>
                         </div>
 
-                        <!-- BARRIO (Al elegir uno, autocompleta/selecciona su zona) -->
+                        <!-- BARRIO -->
                         <div class="col-md-6">
                             <label for="claimNeighborhood" class="form-label">Barrio <span aria-hidden="true">*</span></label>
                             <select id="claimNeighborhood" name="barrio" class="form-select" required>
